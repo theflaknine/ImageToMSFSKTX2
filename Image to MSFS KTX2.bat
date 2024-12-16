@@ -4,7 +4,7 @@ for /F "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1)
   set "DEL=%%a"
 )
 CLS
-SET "log_file=%~dp0\logfile.txt"
+SET "log_file=%~dp0logfile.txt"
 echo Started batch file > %log_file%
 :MENU
 set "settings_file=userConfig.ini"
@@ -39,18 +39,26 @@ if not exist "%~dp0\DECAL" (
 mkdir DECAL
 echo Created DECAL folder >> %log_file%
 )
+set "ALBD_dir=%~dp0ALBD"
+echo ALBD dir is %ALBD_dir% >> %log_file%
+set "COMP_dir=%~dp0COMP"
+echo COMP dir is %COMP_dir% >> %log_file%
+set "NORM_dir=%~dp0NORM"
+echo NORM dir is %NORM_dir% >> %log_file%
+set "DECAL_dir=%~dp0DECAL"
+echo DECAL dir is %DECAL_dir% >> %log_file%
 set albdCount=0
 set compCount=0
 set normCount=0
 set decalCount=0
-for %%f in ("%~dp0\ALBD\*.png") do (set /a albdCount+=1)
+for %%f in ("%ALBD_dir%\*.png") do (set /a albdCount+=1)
 echo Found !albdCount! albedo image files >> %log_file%
-for %%f in ("%~dp0\COMP\*.png") do (set /a compCount+=1)
+for %%f in ("%COMP_dir%\*.png") do (set /a compCount+=1)
 echo Found !compCount! composite image files >> %log_file%
-for %%f in ("%~dp0\NORM\*.png") do (set /a normCount+=1)
+for %%f in ("%NORM_dir%\*.png") do (set /a normCount+=1)
 echo Found !normCount! normal map image files >> %log_file%
-for %%f in ("%~dp0\DECAL\*.png") do (set /a decalCount+=1)
-for %%f in ("%~dp0\DECAL\*.tif") do (set /a decalCount+=1)
+for %%f in ("%DECAL_dir%\*.png") do (set /a decalCount+=1)
+for %%f in ("%DECAL_dir%\*.tif") do (set /a decalCount+=1)
 echo Found !decalCount! decal image files >> %log_file%
 echo Display list of files >> %log_file%
 ECHO                         IMAGE TO MSFS KTX2 CONVERTER                       
@@ -64,13 +72,13 @@ echo Checking albedo files >> %log_file%
 rem cd ALBD
 FOR %%f in (".\ALBD\*.png") do (
 set "filename=%%~nf"
-echo Checking for matching XML for %%~ff  >> %log_file%
+echo ...Checking for matching XML for %%~ff  >> %log_file%
 if exist "%%~ff.xml" (
-echo Found matching XML for %%~ff  >> %log_file%
+echo ......Found matching XML for %%~ff  >> %log_file%
 ECHO [Has XML = OK]   %%f
 set /a countWithXML+=1
 ) else (
-echo No matching XML for %%~ff  >> %log_file%
+echo ......No matching XML for %%~ff  >> %log_file%
 ECHO [Has XML = FAIL] %%f
 set /a countWithoutXML+=1
 )
@@ -84,13 +92,13 @@ echo Checking comp files >> %log_file%
 rem cd COMP
 FOR %%f in (".\COMP\*.png") do (
 set "filename=%%~nf"
-echo Checking for matching XML for %%~ff  >> %log_file%
+echo ...Checking for matching XML for %%~ff  >> %log_file%
 if exist "%%~ff.xml" (
-echo Found matching XML for %%~ff  >> %log_file%
+echo ......Found matching XML for %%~ff  >> %log_file%
 ECHO [Has XML = OK]   %%f
 set /a countWithXML+=1
 ) else (
-echo No matching XML for %%~ff  >> %log_file%
+echo ......No matching XML for %%~ff  >> %log_file%
 ECHO [Has XML = FAIL] %%f
 set /a countWithoutXML+=1
 )
@@ -102,13 +110,13 @@ echo Checking norm files >> %log_file%
 )
 FOR %%f in (".\NORM\*.png") do (
 set "filename=%%~nf"
-echo Checking for matching XML for %%~ff  >> %log_file%
+echo ...Checking for matching XML for %%~ff  >> %log_file%
 if exist "%%~ff.xml" (
-echo Found matching XML for %%~ff  >> %log_file%
+echo ......Found matching XML for %%~ff  >> %log_file%
 ECHO [Has XML = OK]   %%f
 set /a countWithXML+=1
 ) else (
-echo No matching XML for %%~ff  >> %log_file%
+echo ......No matching XML for %%~ff  >> %log_file%
 ECHO [Has XML = FAIL] %%f
 set /a countWithoutXML+=1
 )
@@ -120,26 +128,26 @@ echo Checking decal files >> %log_file%
 )
 FOR %%f in (".\DECAL\*.png") do (
 set "filename=%%~nf"
-echo Checking for matching XML for %%~ff  >> %log_file%
+echo ...Checking for matching XML for %%~ff  >> %log_file%
 if exist "%%~ff.xml" (
-echo Found matching XML for %%~ff  >> %log_file%
+echo ......Found matching XML for %%~ff  >> %log_file%
 ECHO [Has XML = OK]   %%f
 set /a countWithXML+=1
 ) else (
-echo No matching XML for %%~ff  >> %log_file%
+echo ......No matching XML for %%~ff  >> %log_file%
 ECHO [Has XML = FAIL] %%f
 set /a countWithoutXML+=1
 )
 )
 FOR %%f in (".\DECAL\*.tif") do (
 set "filename=%%~nf"
-echo Checking for matching XML for %%~ff  >> %log_file%
+echo ...Checking for matching XML for %%~ff  >> %log_file%
 if exist "%%~ff.xml" (
-echo Found matching XML for %%~ff  >> %log_file%
+echo ......Found matching XML for %%~ff  >> %log_file%
 ECHO [Has XML = OK]   %%f
 set /a countWithXML+=1
 ) else (
-echo No matching XML for %%~ff  >> %log_file%
+echo ......No matching XML for %%~ff  >> %log_file%
 ECHO [Has XML = FAIL] %%f
 set /a countWithoutXML+=1
 )
@@ -174,102 +182,69 @@ cls
 goto MENU
 :CREATEXMLS
 echo User chose option 2 >> %log_file%
-echo Change Dir to ALBD >> %log_file%
-cd ALBD
-for %%f in (*.png) do (
-if not exist "%%~nf.xml" (
-echo Creating XML file for %%~nf.PNG
-echo Creating XML file for %%~nf.PNG >> %log_file%
-echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~ff.xml"
+echo Creating missing XMLs for albedo files >> %log_file%
+for %%f in ("%ALBD_dir%\*.png") do (
+if not exist "%%~dpnf.xml" (
+echo ...Creating XML file for %%~dpnf >> %log_file%
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
 )
 )
-echo Change Dir to parent >> %log_file%
-cd..
-echo Change Dir to COMP >> %log_file%
-cd COMP
-for %%f in (*.png) do (
-if not exist "%%~nf.xml" (
-echo Creating XML file for %%~ff.PNG
-echo Creating XML file for %%~ff.PNG >> %log_file%
-echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_METAL_ROUGH_AO^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^<ForceNoAlpha^>true^</ForceNoAlpha^>^</BitmapConfiguration^> > "%%~ff.xml"
+echo Creating missing XMLs for composite files >> %log_file%
+for %%f in ("%COMP_dir%\*.png") do (
+if not exist "%%~dpnf.xml" (
+echo ...Creating XML file for %%~dpff >> %log_file%
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_METAL_ROUGH_AO^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^<ForceNoAlpha^>true^</ForceNoAlpha^>^</BitmapConfiguration^> > "%%~dpff.xml"
 )
 )
-echo Change Dir to parent >> %log_file%
-cd..
-echo Change Dir to NORM >> %log_file%
-cd NORM
-for %%f in (*.png) do (
-if not exist "%%~nf.xml" (
-echo Creating XML file for %%~nf.PNG
-echo Creating XML file for %%~ff.PNG >> %log_file%
-echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_NORMAL^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~ff.xml"
+echo Creating missing XMLs for normal files >> %log_file%
+for %%f in ("%NORM_dir%\*.png") do (
+if not exist "%%~dpnf.xml" (
+echo ...Creating XML file for %%~dpff >> %log_file%
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_NORMAL^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
 )
 )
-echo Change Dir to parent >> %log_file%
-cd..
-echo Change Dir to DECAL >> %log_file%
-cd DECAL
-for %%f in (*.png) do (
-if not exist "%%~nf.xml" (
-echo Creating XML file for %%~nf.PNG
-echo Creating XML file for %%~ff.PNG >> %log_file%
-echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_NORMAL^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~ff.xml"
+echo Creating missing XMLs for decal PNG files >> %log_file%
+for %%f in ("%DECAL_dir%\*.png") do (
+if not exist "%%~dpnf.xml" (
+echo ...Creating XML file for %%~dpff>> %log_file%
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_NORMAL^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
 )
 )
-for %%f in (*.tif) do (
-if not exist "%%~nf.xml" (
-echo Creating XML file for %%~nf.TIF
-echo Creating XML file for %%~ff.PNG >> %log_file%
-echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_NORMAL^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~ff.xml"
+echo Creating missing XMLs for decal TIF files >> %log_file%
+for %%f in ("%DECAL_dir%\*.tif") do (
+if not exist "%%~dpnf.xml" (
+echo ...Creating XML file for %%~dpff >> %log_file%
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_NORMAL^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
 )
 )
-echo Change Dir to parent >> %log_file%
-cd..
 cls
 goto MENU
 :RECREATEXMLS
 echo User chose option 3 >> %log_file%
-echo Change Dir to ALBD >> %log_file%
-cd ALBD
-for %%f in (*.png) do (
-echo Creating XML file for %%~nf.PNG
-echo Creating XML file for %%~ff.PNG >> %log_file%
-echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~ff.xml"
+echo Recreating XMLs for albedo files >> %log_file%
+for %%f in ("%ALBD_dir%\*.png") do (
+echo ...Creating XML file for %%~dpff >> %log_file%
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
 )
-echo Change Dir to parent >> %log_file%
-cd..
-echo Change Dir to COMP >> %log_file%
-cd COMP
-for %%f in (*.png) do (
-echo Creating XML file for %%~nf.PNG
-echo Creating XML file for %%~ff.PNG >> %log_file%
-echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_METAL_ROUGH_AO^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^<ForceNoAlpha^>true^</ForceNoAlpha^>^</BitmapConfiguration^> > "%%~ff.xml"
+echo Recreating XMLs for composite files >> %log_file%
+for %%f in ("%COMP_dir%\*.png") do (
+echo ...Creating XML file for %%~dpff >> %log_file%
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_METAL_ROUGH_AO^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^<ForceNoAlpha^>true^</ForceNoAlpha^>^</BitmapConfiguration^> > "%%~dpff.xml"
 )
-echo Change Dir to parent >> %log_file%
-cd..
-echo Change Dir to NORM >> %log_file%
-cd NORM
-for %%f in (*.png) do (
-echo Creating XML file for %%~nf.PNG
-echo Creating XML file for %%~ff.PNG >> %log_file%
-echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_NORMAL^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~ff.xml"
+echo Recreating XMLs for normal files >> %log_file%
+for %%f in ("%NORM_dir%\*.png") do (
+echo ...Creating XML file for %%~dpff >> %log_file%
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_NORMAL^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
 )
-echo Change Dir to parent >> %log_file%
-cd..
-echo Change Dir to DECAL >> %log_file%
-cd DECAL
-for %%f in (*.png) do (
-echo Creating XML file for %%~nf.PNG
-echo Creating XML file for %%~ff.PNG >> %log_file%
-echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_NORMAL^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~ff.xml"
+echo Recreating XMLs for decal files >> %log_file%
+for %%f in ("%DECAL_dir%\*.png") do (
+echo ...Creating XML file for %%~dpff >> %log_file%
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_NORMAL^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
 )
-for %%f in (*.tif) do (
-echo Creating XML file for %%~nf.TIF
-echo Creating XML file for %%~ff.TIF >> %log_file%
-echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_NORMAL^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~ff.xml"
+for %%f in ("%DECAL_dir%\*.tif") do (
+echo ...5Creating XML file for %%~dpff >> %log_file%
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_NORMAL^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
 )
-echo Change Dir to parent >> %log_file%
-cd..
 cls
 goto MENU
 :CREATEKTX2
@@ -310,62 +285,56 @@ rem Create project xml
 echo Create project XML PNG2KTX2.xml >> %log_file%
 echo ^<?xml version="1.0" encoding="utf-8"?^>^<Project Version="2" Name="PNG TO KTX2 CONVERTER" FolderName="Packages" MetadataFolderName="PackagesMetadata"^>^<OutputDirectory^>.^</OutputDirectory^>^<TemporaryOutputDirectory^>_PackageInt^</TemporaryOutputDirectory^>^<Packages^>^<Package^>PackageDefinitions\PNG2KTX2.xml^</Package^>^</Packages^>^</Project^> > PNG2KTX2.xml
 rem Copy Albedo PNG and XML files
-echo Change dir to ALBD >> %log_file%
-cd ALBD
-for %%f in (*.png) do (
-if exist "%%~nf.png" (
-echo Copy "%%~ff.xml" to "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
-copy /y "%%~ff.xml" "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
-echo Copy "%%~ff.png" to "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
-copy /y "%%~nf.png" "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+rem echo Change dir to ALBD >> %log_file%
+rem cd ALBD
+echo For each PNG in !ALBD_dir!... >> %log_file%
+for %%f in ("%ALBD_dir%\*.png") do (
+if exist "%%~dpnf.png" (
+echo Copy "%%~dpff.xml" to "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+copy /y "%%~dpff.xml" "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+echo Copy "%%~dpnf.png" to "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+copy /y "%%~dpnf.png" "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
 )
 )
-cd..
 rem Copy Composite PNG and XML files
-echo Change dir to COMP >> %log_file%
-cd COMP
-for %%f in (*.png) do (
-if exist "%%~nf.png" (
-echo Copy "%%~ff.xml" to "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
-copy /y "%%~ff.xml" "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
-echo Copy "%%~ff.png" to "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
-copy /y "%%~nf.png" "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+echo For each PNG in !COMP_dir!... >> %log_file%
+for %%f in ("%COMP_dir%\*.png") do (
+if exist "%%~dpnf.png" (
+echo ...Copy "%%~dpff.xml" to "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+copy /y "%%~dpff.xml" "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+echo ...Copy "%%~dpnf.png" to "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+copy /y "%%~dpnf.png" "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
 )
 )
-echo Change Dir to parent >> %log_file%
-cd..
 rem Normal PNG and XML files
-echo Change dir to NORM >> %log_file%
-cd NORM
-for %%f in (*.png) do (
-if exist "%%~nf.png" (
-echo Copy "%%~ff.xml" to "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
-copy /y "%%~ff.xml" "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
-echo Copy "%%~ff.png" to "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
-copy /y "%%~nf.png" "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+echo For each PNG in !NORM_dir!... >> %log_file%
+for %%f in ("%NORM_dir%\*.png") do (
+if exist "%%~dpnf.png" (
+echo ...Copy "%%~dpff.xml" to "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+copy /y "%%~dpff.xml" "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+echo ...Copy "%%~dpnf.png" to "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+copy /y "%%~dpnf.png" "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
 )
 )
-echo Change Dir to parent >> %log_file%
-cd..
 rem Decal PNG TIF and XML files
-cd DECAL
-for %%f in (*.png) do (
-if exist "%%~nf.png" (
-echo Copy "%%~ff.xml" to "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
-copy /y "%%~ff.xml" "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
-echo Copy "%%~ff.png" to "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
-copy /y "%%~nf.png" "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+echo For each PNG in !DECAL_dir!... >> %log_file%
+for %%f in ("%DECAL_dir%\*.png") do (
+if exist "%%~dpnf.png" (
+echo ...Copy "%%~dpff.xml" to "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+copy /y "%%~dpff.xml" "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+echo ...Copy "%%~dpnf.png" to "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+copy /y "%%~dpnf.png" "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
 )
 )
-for %%f in (*.tif) do (
-if exist "%%~nf.tif" (
-echo Copy "%%~ff.xml" to "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
-copy /y "%%~ff.xml" "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
-echo Copy "%%~ff.tif" to "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
-copy /y "%%~nf.tif" "..\PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+echo For each TIF in !DECAL_dir!... >> %log_file%
+for %%f in ("%DECAL_dir%\*.tif") do (
+if exist "%%~dpnf.tif" (
+echo ...Copy "%%~dpff.xml" to "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+copy /y "%%~dpff.xml" "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+echo ...Copy "%%~dpnf.tif" to "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
+copy /y "%%~dpnf.tif" "%~dp0PackageSources\SimObjects\Airplanes\PNG2KTX2\common\texture\" >> %log_file%
 )
 )
-cd..
 ECHO Step 1 of 3: Launching standalone Flight Simulator package tool... 
 echo Step 1 of 3: Launching standalone Flight Simulator package tool...  >> %log_file%
 "%sdk_root%\tools\bin\fspackagetool.exe" -nopause -outputtoseparateconsole "PNG2KTX2.xml"
@@ -381,6 +350,7 @@ if "%ERRORLEVEL%"=="0" (
 cls
 echo Step 3 of 3: Completed generation of KTX2 files. Press any key to clean up temporary files and finish.
 echo Step 3 of 3: Completed generation of KTX2 files. Press any key to clean up temporary files and finish.  >> %log_file%
+color 2f
 pause >nul
 if not exist "OUTPUT" (mkdir OUTPUT)
 xcopy .\Packages\png2ktx2\SimObjects\Airplanes\PNG2KTX2\common\texture\*.* .\OUTPUT\ /s /e /y /I
