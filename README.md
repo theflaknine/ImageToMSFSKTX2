@@ -6,7 +6,7 @@ A batch file to convert image files to Microsoft Flight Simulator 2024 KTX2 file
 
 1. Copy the batch file to a folder of your choice. It doesn't matter where this batch file is located, it'll create the necessary folders relative to itself. You may want to add a copy to each livery project artwork folder.
 2. You must have the Microsoft Flight Simulator 2024 SDK installed.
-3. When you first run the batch file it will prompt you for the path to the MSFS 2024 SDK, for example, C:\MSFS 2024 SDK. It expects a path without a trailing backslash and will trim it off if you do add it.
+3. When you first run the batch file it will prompt you for the path to the MSFS 2024 SDK, for example, `C:\MSFS 2024 SDK`. It expects a path without a trailing backslash and will trim it off if you do add it.
 4. The batch file will also create four folders ALBD, COMP, NORM and DECAL.
 
 ## Instructions - converting livery artwork to KTX2
