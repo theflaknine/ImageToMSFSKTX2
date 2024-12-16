@@ -14,9 +14,16 @@ for /f "delims=" %%i in (%settings_file%) do set "sdk_root=%%i"
 echo Read MSFS SDK path as !sdk_root! >> %log_file%
 ) else (
 echo Prompted user for MSFS SDK >> %log_file%
-set /p new_path=Enter the path for the MSFS SDK, for example C:\MSFS 2024 SDK 
-echo !new_path!>userConfig.ini
+set /p new_path=Enter the path for the MSFS SDK, for example C:\MSFS 2024 SDK: 
 echo User entered !new_path! >> %log_file%
+set "last_char=!new_path:~-1!"
+echo Last character is !last_char! >> %log_file%
+if "!last_char!"=="\" (
+echo Removing trailing backslash >> %log_file%
+SET "new_path=!new_path:~0,-1!"
+)
+echo !new_path!>userConfig.ini
+echo SDK path set to !new_path! >> %log_file%
 set "sdk_root=!new_path!"
 cls
 )
@@ -69,7 +76,6 @@ if !albdCount! gtr 0 (
 ECHO ----------------------------- ALBEDO PNG files -----------------------------
 echo Checking albedo files >> %log_file%
 )
-rem cd ALBD
 FOR %%f in (".\ALBD\*.png") do (
 set "filename=%%~nf"
 echo ...Checking for matching XML for %%~ff  >> %log_file%
@@ -83,13 +89,11 @@ ECHO [Has XML = FAIL] %%f
 set /a countWithoutXML+=1
 )
 )
-rem cd..
 if !compCount! gtr 0 (
 ECHO.
 ECHO --------------------------- COMPOSITE PNG files ----------------------------
 echo Checking comp files >> %log_file%
 )
-rem cd COMP
 FOR %%f in (".\COMP\*.png") do (
 set "filename=%%~nf"
 echo ...Checking for matching XML for %%~ff  >> %log_file%
@@ -275,7 +279,8 @@ if not exist "PackageDefinitions" (
 echo Folder didn't exist so creating PackageDefinitions >> %log_file%
 mkdir PackageDefinitions
 )
-rem Create package definition xml
+rem Create package definition xml - UPDATE THIS TO AVOID CHANGE DIR
+echo Change Dir to PackageDefinitions >> %log_file%
 cd PackageDefinitions
 echo Change Dir to PackageDefinitions then create definition XML PNG2KTX2.xml >> %log_file%
 echo ^<?xml version="1.0" encoding="utf-8"?^>^<AssetPackage Version="0.1.0"^>^<ItemSettings^>^<ContentType^>AIRCRAFT^</ContentType^>^<Title^>PNG TO KTX2 CONVERTER^</Title^>^<Manufacturer^>FlakNine^</Manufacturer^>^<Creator^>FlakNine^</Creator^>^</ItemSettings^>^<Flags^>^<VisibleInStore^>true^</VisibleInStore^>^<CanBeReferenced^>true^</CanBeReferenced^>^</Flags^>^<AssetGroups^>^<AssetGroup Name="PNG TO KTX2 CONVERTER"^>^<Type^>ModularSimObject^</Type^>^<Flags^>^<FSXCompatibility^>false^</FSXCompatibility^>^</Flags^>^<AssetDir^>PackageSources\SimObjects\Airplanes\PNG2KTX2\^</AssetDir^>^<OutputDir^>SimObjects\Airplanes\PNG2KTX2\^</OutputDir^>^</AssetGroup^>^</AssetGroups^>^</AssetPackage^> > PNG2KTX2.xml
@@ -285,8 +290,6 @@ rem Create project xml
 echo Create project XML PNG2KTX2.xml >> %log_file%
 echo ^<?xml version="1.0" encoding="utf-8"?^>^<Project Version="2" Name="PNG TO KTX2 CONVERTER" FolderName="Packages" MetadataFolderName="PackagesMetadata"^>^<OutputDirectory^>.^</OutputDirectory^>^<TemporaryOutputDirectory^>_PackageInt^</TemporaryOutputDirectory^>^<Packages^>^<Package^>PackageDefinitions\PNG2KTX2.xml^</Package^>^</Packages^>^</Project^> > PNG2KTX2.xml
 rem Copy Albedo PNG and XML files
-rem echo Change dir to ALBD >> %log_file%
-rem cd ALBD
 echo For each PNG in !ALBD_dir!... >> %log_file%
 for %%f in ("%ALBD_dir%\*.png") do (
 if exist "%%~dpnf.png" (
