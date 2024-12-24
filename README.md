@@ -26,22 +26,22 @@ For each of your PNG files, the script:
 4. Cleans up any temporary files
 
 ### Albedo textures
-BitmapSlot String: MTL_BITMAP_DECAL0
-UserFlags: QUALITYHIGH
-ForceNoAlpha: FALSE
+- BitmapSlot String: MTL_BITMAP_DECAL0
+- UserFlags: QUALITYHIGH
+- ForceNoAlpha: FALSE
 
 ### Composite textures
-BitmapSlot String: MTL_BITMAP_METAL_ROUGH_AO
-UserFlags: QUALITYHIGH
-ForceNoAlpha: TRUE
+- BitmapSlot String: MTL_BITMAP_METAL_ROUGH_AO
+- UserFlags: QUALITYHIGH
+- ForceNoAlpha: TRUE
 
 ### Normal textures
-BitmapSlot String: MTL_BITMAP_NORMAL
-UserFlags: QUALITYHIGH
-ForceNoAlpha: FALSE
+- BitmapSlot String: MTL_BITMAP_NORMAL
+- UserFlags: QUALITYHIGH
+- ForceNoAlpha: FALSE
 
 ### Decal textures
-BitmapSlot String: MTL_BITMAP_DECAL0
-UserFlags: QUALITYHIGH
-ForceNoAlpha: FALSE
+- BitmapSlot String: MTL_BITMAP_DECAL0
+- UserFlags: QUALITYHIGH
+- ForceNoAlpha: FALSE
 
