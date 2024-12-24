@@ -26,21 +26,25 @@ For each of your PNG files, the script:
 4. Cleans up any temporary files
 
 ### Albedo textures
+*Defines the base colour of your texture. If you are new to livery painting and aren't sure what type of texture you've created, it's most likely an albedo texture.*
 - BitmapSlot String: MTL_BITMAP_DECAL0
 - UserFlags: QUALITYHIGH
 - ForceNoAlpha: FALSE
 
 ### Composite textures
+*A composite image where the red channel defines ambient occlusion, green channel defines roughness, blue defines metallicness.*
 - BitmapSlot String: MTL_BITMAP_METAL_ROUGH_AO
 - UserFlags: QUALITYHIGH
 - ForceNoAlpha: TRUE
 
 ### Normal textures
+*Encodes surface normal directions using colour values, to simulate detailed textures without increasing the polygon count of the 3D model.*
 - BitmapSlot String: MTL_BITMAP_NORMAL
 - UserFlags: QUALITYHIGH
 - ForceNoAlpha: FALSE
 
 ### Decal textures
+*Used to apply details like labels and insignia on top of the base (albedo) texture. Currently, this uses the same flags as Albedo, but also handles TIF input.*
 - BitmapSlot String: MTL_BITMAP_DECAL0
 - UserFlags: QUALITYHIGH
 - ForceNoAlpha: FALSE
