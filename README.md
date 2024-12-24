@@ -16,3 +16,32 @@ A batch file to convert image files to Microsoft Flight Simulator 2024 KTX2 file
 3. From the command list, choose to generate the KTX2 files. This command is only available once each of your image files has a corresponding XML file.
 4. The script will launch the SDK and generate the KTX2 files. You should see a separate splash screen and console window. When these have disappeared press any key to finish. Your KTX2 and JSON files will be in a folder called OUTPUT, which is opened automatically in Windows Explorer.
 5. Batch file activity is logged in logfile.txt
+
+## What does the script do?
+
+For each of your PNG files, the script:
+1. Generates a [texture XML file](https://docs.flightsimulator.com/msfs2024/html/5_Content_Configuration/Textures/Texture_XML_Properties.htm) with suitable flags for Albedo, Composite, Normal or Decal image types (see below).
+2. Sends the PNG and accompanying XML file to the Microsoft Flight Simulator 2024 SDK package builder, which compiles a KTX2 file and accompanying JSON file.
+3. Copies the KTX2 and JSON file to the script's "OUTPUT" folder
+4. Cleans up any temporary files
+
+### Albedo textures
+BitmapSlot String: MTL_BITMAP_DECAL0
+UserFlags: QUALITYHIGH
+ForceNoAlpha: FALSE
+
+### Composite textures
+BitmapSlot String: MTL_BITMAP_METAL_ROUGH_AO
+UserFlags: QUALITYHIGH
+ForceNoAlpha: TRUE
+
+### Normal textures
+BitmapSlot String: MTL_BITMAP_NORMAL
+UserFlags: QUALITYHIGH
+ForceNoAlpha: FALSE
+
+### Decal textures
+BitmapSlot String: MTL_BITMAP_DECAL0
+UserFlags: QUALITYHIGH
+ForceNoAlpha: FALSE
+
