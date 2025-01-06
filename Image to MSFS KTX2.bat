@@ -5,7 +5,7 @@ for /F "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1)
 )
 CLS
 SET "log_file=%~dp0logfile.txt"
-echo Started MSFS KTX2 version 0.4 > "%log_file%"
+echo Started MSFS KTX2 version 0.6 > "%log_file%"
 :MENU
 set "settings_file=userConfig.ini"
 if exist "%settings_file%" (
@@ -279,16 +279,11 @@ if not exist "PackageDefinitions" (
 echo Folder didn't exist so creating PackageDefinitions >> "%log_file%"
 mkdir PackageDefinitions
 )
-rem Create package definition xml - UPDATE THIS TO AVOID CHANGE DIR
-echo Change Dir to PackageDefinitions >> "%log_file%"
-cd PackageDefinitions
-echo Change Dir to PackageDefinitions then create definition XML png-2-ktx2.xml >> "%log_file%"
-echo ^<?xml version="1.0" encoding="utf-8"?^>^<AssetPackage Version="0.1.0"^>^<ItemSettings^>^<ContentType^>AIRCRAFT^</ContentType^>^<Title^>PNG TO KTX2 CONVERTER^</Title^>^<Manufacturer^>FlakNine^</Manufacturer^>^<Creator^>FlakNine^</Creator^>^</ItemSettings^>^<Flags^>^<VisibleInStore^>true^</VisibleInStore^>^<CanBeReferenced^>true^</CanBeReferenced^>^</Flags^>^<AssetGroups^>^<AssetGroup Name="PNG TO KTX2 CONVERTER"^>^<Type^>ModularSimObject^</Type^>^<Flags^>^<FSXCompatibility^>false^</FSXCompatibility^>^</Flags^>^<AssetDir^>PackageSources\SimObjects\Airplanes\png-2-ktx2\^</AssetDir^>^<OutputDir^>SimObjects\Airplanes\png-2-ktx2\^</OutputDir^>^</AssetGroup^>^</AssetGroups^>^</AssetPackage^> > png-2-ktx2.xml
-echo Change Dir to parent >> "%log_file%"
-cd.. 
-rem Create project xml
+rem Create package definition xml
+echo Create Package Definition XML png-2-ktx2.xml in PackageDefinitions folder >> "%log_file%"
+echo ^<?xml version="1.0" encoding="utf-8"?^>^<AssetPackage Version="0.1.0"^>^<ItemSettings^>^<ContentType^>AIRCRAFT^</ContentType^>^<Title^>PNG TO KTX2 CONVERTER^</Title^>^<Manufacturer^>FlakNine^</Manufacturer^>^<Creator^>FlakNine^</Creator^>^</ItemSettings^>^<Flags^>^<VisibleInStore^>true^</VisibleInStore^>^<CanBeReferenced^>true^</CanBeReferenced^>^</Flags^>^<AssetGroups^>^<AssetGroup Name="PNG TO KTX2 CONVERTER"^>^<Type^>ModularSimObject^</Type^>^<Flags^>^<FSXCompatibility^>false^</FSXCompatibility^>^</Flags^>^<AssetDir^>PackageSources\SimObjects\Airplanes\png-2-ktx2\^</AssetDir^>^<OutputDir^>SimObjects\Airplanes\png-2-ktx2\^</OutputDir^>^</AssetGroup^>^</AssetGroups^>^</AssetPackage^> > "%~dp0\PackageDefinitions\png-2-ktx2.xml"
 echo Create project XML png-2-ktx2.xml >> "%log_file%"
-echo ^<?xml version="1.0" encoding="utf-8"?^>^<Project Version="2" Name="PNG TO KTX2 CONVERTER" FolderName="Packages" MetadataFolderName="PackagesMetadata"^>^<OutputDirectory^>.^</OutputDirectory^>^<TemporaryOutputDirectory^>_PackageInt^</TemporaryOutputDirectory^>^<Packages^>^<Package^>PackageDefinitions\png-2-ktx2.xml^</Package^>^</Packages^>^</Project^> > png-2-ktx2.xml
+echo ^<?xml version="1.0" encoding="utf-8"?^>^<Project Version="2" Name="PNG TO KTX2 CONVERTER" FolderName="Packages" MetadataFolderName="PackagesMetadata"^>^<OutputDirectory^>.^</OutputDirectory^>^<TemporaryOutputDirectory^>_PackageInt^</TemporaryOutputDirectory^>^<Packages^>^<Package^>PackageDefinitions\png-2-ktx2.xml^</Package^>^</Packages^>^</Project^> > "%~dp0\png-2-ktx2.xml"
 rem Copy Albedo PNG and XML files
 echo For each PNG in !ALBD_dir!... >> "%log_file%"
 for %%f in ("%ALBD_dir%\*.png") do (
@@ -355,8 +350,8 @@ echo Step 3 of 3: Completed generation of KTX2 files. Press any key to clean up 
 echo Step 3 of 3: Completed generation of KTX2 files. Press any key to clean up temporary files and finish.  >> "%log_file%"
 color 2f
 pause >nul
-if not exist "OUTPUT" (mkdir OUTPUT)
-xcopy .\Packages\png-2-ktx2\SimObjects\Airplanes\png-2-ktx2\common\texture\*.* .\OUTPUT\ /s /e /y /I
+if not exist "%~dp0\OUTPUT" (mkdir "%~dp0\OUTPUT")
+xcopy .\Packages\png-2-ktx2\SimObjects\Airplanes\png-2-ktx2\common\texture\*.* "%~dp0\OUTPUT\"  /s /e /y /I
 echo Delete temporary folders >> "%log_file%"
 rmdir /s /q "_PackageInt"
 rmdir /s /q "PackageDefinitions"
@@ -366,7 +361,7 @@ rmdir /s /q "Packages"
 echo Delete project file png-2-ktx2.xml  >> "%log_file%"
 del /q png-2-ktx2.xml 
 echo Open the new folder OUTPUT >> "%log_file%"
-start "" ".\OUTPUT"
+start "" "%~dp0\OUTPUT"
 echo End of script >> "%log_file%"
 goto EOF
 :REFRESH
