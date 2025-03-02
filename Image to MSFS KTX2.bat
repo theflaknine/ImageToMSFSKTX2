@@ -5,7 +5,7 @@ for /F "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1)
 )
 CLS
 SET "log_file=%~dp0logfile.txt"
-SET "AppVersion=0.7"
+SET "AppVersion=0.8"
 echo %DATE% %TIME% Started Image to MSFS KTX2 version %AppVersion% > "%log_file%"
 :MENU
 set "settings_file=userConfig.ini"
@@ -349,8 +349,9 @@ copy /y "%%~dpnf.tif" "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\commo
 )
 ECHO Step 1 of 3: Launching standalone Flight Simulator package tool... 
 echo %DATE% %TIME% Step 1 of 3: Launching standalone Flight Simulator package tool...  >> "%log_file%"
-echo %DATE% %TIME% Command sent: "%sdk_root%\tools\bin\fspackagetool.exe" -nopause -outputtoseparateconsole "png-2-ktx2.xml" >> "%log_file%"
-"%sdk_root%\tools\bin\fspackagetool.exe" -nopause -outputtoseparateconsole "png-2-ktx2.xml"
+echo %DATE% %TIME% Command sent: "%sdk_root%\tools\bin\fspackagetool.exe" -nopause -outputtoseparateconsole "%~dp0png-2-ktx2.xml" >> "%log_file%"
+rem RUNNING THE FSPACKAGETOOL.EXE
+"%sdk_root%\tools\bin\fspackagetool.exe" -nopause -outputtoseparateconsole "%~dp0png-2-ktx2.xml"
 cls
 echo Step 2 of 3: Generating KTX2 files...
 echo %DATE% %TIME% Step 2 of 3: Generating KTX2 files...  >> "%log_file%"
@@ -366,9 +367,9 @@ echo Step 3 of 3: Completed generation of KTX2 files. Press any key to clean up 
 echo %DATE% %TIME% Step 3 of 3: Completed generation of KTX2 files. Press any key to clean up temporary files and finish.  >> "%log_file%"
 color 2f
 pause >nul
-echo %DATE% %TIME% Creating folder if it doesn't exist: "%~dp0\OUTPUT" >> "%log_file%"
-if not exist "%~dp0\OUTPUT" (mkdir "%~dp0\OUTPUT")
-xcopy "%~dp0\Packages\png-2-ktx2\SimObjects\Airplanes\png-2-ktx2\common\texture\*.*" "%~dp0\OUTPUT\"  /s /e /y /I
+echo %DATE% %TIME% Creating folder if it doesn't exist: "%~dp0OUTPUT" >> "%log_file%"
+if not exist "%~dp0\OUTPUT" (mkdir "%~dp0OUTPUT")
+xcopy "%~dp0Packages\png-2-ktx2\SimObjects\Airplanes\png-2-ktx2\common\texture\*.*" "%~dp0OUTPUT\"  /s /e /y /I
 echo %DATE% %TIME% Delete temporary folders >> "%log_file%"
 rmdir /s /q "_PackageInt"
 rmdir /s /q "PackageDefinitions"
@@ -378,7 +379,7 @@ rmdir /s /q "Packages"
 echo %DATE% %TIME% Delete project file png-2-ktx2.xml  >> "%log_file%"
 del /q png-2-ktx2.xml 
 echo %DATE% %TIME% Open the new folder OUTPUT >> "%log_file%"
-start "" "%~dp0\OUTPUT"
+start "" "%~dp0OUTPUT"
 echo %DATE% %TIME% End of script >> "%log_file%"
 goto EOF
 :REFRESH
