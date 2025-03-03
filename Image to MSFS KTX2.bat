@@ -5,14 +5,77 @@ for /F "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1)
 )
 CLS
 SET "log_file=%~dp0logfile.txt"
-SET "AppVersion=0.8"
+SET "AppVersion=0.9"
+SET "SimType=Unknown"
 echo %DATE% %TIME% Started Image to MSFS KTX2 version %AppVersion% > "%log_file%"
 :MENU
 set "settings_file=userConfig.ini"
-if exist "%settings_file%" (
+if not exist "%settings_file%" (
+	rem Cannot find setting file, prompt user for settings
+	rem Prompt user for setting: SDK Path
+	echo %DATE% %TIME% Prompted user for MSFS SDK >> "%log_file%"
+	set /p new_path=Enter the path for the MSFS SDK, for example C:\MSFS 2024 SDK: 
+	echo %DATE% %TIME% User entered !new_path! >> "%log_file%"
+	set "last_char=!new_path:~-1!"
+	echo %DATE% %TIME% Last character is 0!last_char! >> "%log_file%"
+	if "!last_char!"=="\" (
+	echo %DATE% %TIME% Removing trailing backslash >> "%log_file%"
+	SET "new_path=!new_path:~0,-1!"
+	)
+	rem Prompt user for game version
+	CLS
+	call :SIMTYPEMENU
+	goto WRITESETTINGS
+) else (GOTO READSETTINGS)
+
+:SIMTYPEMENU
+SET /p choice=Define which version of Microsoft Flight Simulator 2024 you are using: 1 = MICROSOFT; 2 = STEAM; then press ENTER:
+IF %choice%==1 (
+	set "simType=MICROSOFT"
+) else if %choice%==2 (
+	set "simType=STEAM"
+) else (
+echo Invalid value, try again
+goto SIMTYPEMENU
+)
 echo %DATE% %TIME% Found settings file %settings_file% >> "%log_file%"
-for /f "delims=" %%i in (%settings_file%) do set "sdk_root=%%i"
-echo %DATE% %TIME% Read MSFS SDK path as !sdk_root! >> "%log_file%"
+Exit /B
+
+:WRITESETTINGS
+rem Write variables to settings files
+(
+echo AppVersion=%AppVersion%
+echo SimType=%simType%
+echo sdk_root=!new_path!
+)>userConfig.ini 
+
+:READSETTINGS
+rem Read first line of the settings file
+set /p firstLine=<%settings_file%
+echo %firstLine% | findstr /b /c:"AppVersion" >nul
+if %errorlevel%==0 (
+rem Settings file starts with AppVersion
+set isAppVersion=true
+echo %DATE% %TIME% The settings file %settings_file% has the correct format>> "%log_file%"
+) else (
+rem Settings file does not start with AppVersion
+set isAppVersion=false
+echo %DATE% %TIME% The settings file %settings_file% has the correct format and will be deleted>> "%log_file%"
+echo The UserConfig.ini settings file for IMAGE TO MSFS KTX2 was created before v0.8 and will be deleted. 
+echo You will need to enter your settings again. Press any key to proceed.
+Pause
+del /f /q "UserConfig.ini"
+CLS
+GOTO MENU
+)
+rem Read the settings from the file
+for /f "tokens=1,2 delims==" %%A in (%settings_file%) do (set "%%A=%%B")
+
+rem Write the settings to the log file
+echo %DATE% %TIME% AppVersion is %AppVersion% >> "%log_file%"
+echo %DATE% %TIME% Read settings from settings file: SimType is %SimType% >> "%log_file%"
+echo %DATE% %TIME% Read settings from settings file: sdk_root is %sdk_root% >> "%log_file%"
+
 rem Get SDK version from version.txt file
 if exist "!sdk_root!\version.txt" (
 set /p sdkVer=<!sdk_root!\version.txt
@@ -20,19 +83,12 @@ echo %DATE% %TIME% MSFS SDK version: !sdkVer! >> "%log_file%"
 ) else (
 set sdkVer=Unknown
 )
-) else (
-echo %DATE% %TIME% Prompted user for MSFS SDK >> "%log_file%"
-set /p new_path=Enter the path for the MSFS SDK, for example C:\MSFS 2024 SDK: 
-echo %DATE% %TIME% User entered !new_path! >> "%log_file%"
-set "last_char=!new_path:~-1!"
-echo %DATE% %TIME% Last character is !last_char! >> "%log_file%"
-if "!last_char!"=="\" (
-echo %DATE% %TIME% Removing trailing backslash >> "%log_file%"
-SET "new_path=!new_path:~0,-1!"
-)
-echo !new_path!>userConfig.ini
-echo %DATE% %TIME% SDK path set to !new_path! >> "%log_file%"
-set "sdk_root=!new_path!"
+rem ) else (
+
+rem echo !new_path!>userConfig.ini
+rem echo %DATE% %TIME% SDK path set to !new_path! >> "%log_file%"
+rem set "sdk_root=!new_path!"
+
 if exist "!sdk_root!\version.txt" (
 set /p sdkVer=<!sdk_root!\version.txt
 echo %DATE% %TIME% MSFS SDK version: !sdkVer! >> "%log_file%"
@@ -41,6 +97,7 @@ set sdkVer=Unknown
 )
 cls
 )
+
 SET countWithXML=0
 SET countWithoutXML=0
 SET totalCount=0
@@ -174,7 +231,7 @@ set /a totalCount=countWithXML+countWithoutXML
 ECHO.
 ECHO --------------------------------- COMMANDS ---------------------------------
 echo %DATE% %TIME% Display command list >> "%log_file%"
-ECHO  1 - Update SDK path (%sdk_root% ; version = %sdkVer%)
+ECHO  1 - Modify configuration [SDK Path:%sdk_root% ; SDK version: v%sdkVer%; Sim version:%simType%]
 ECHO  2 - Generate missing XML files for !countWithoutXML! of !totalCount! image files
 ECHO  3 - Regenerate XML files for all !totalCount! image files
 if !countWithoutXML! gtr 0 (
@@ -349,9 +406,21 @@ copy /y "%%~dpnf.tif" "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\commo
 )
 ECHO Step 1 of 3: Launching standalone Flight Simulator package tool... 
 echo %DATE% %TIME% Step 1 of 3: Launching standalone Flight Simulator package tool...  >> "%log_file%"
-echo %DATE% %TIME% Command sent: "%sdk_root%\tools\bin\fspackagetool.exe" -nopause -outputtoseparateconsole "%~dp0png-2-ktx2.xml" >> "%log_file%"
+ECHO Sim type: %simType%
+ECHO Project file: %~dp0png-2-ktx2.xml
 rem RUNNING THE FSPACKAGETOOL.EXE
+echo %DATE% %TIME% Using sim type of: %simType% >> "%log_file%"
+if %SimType%==STEAM (
+rem Use the -forcesteam parameter (Steam version of sim)
+echo %DATE% %TIME% Command sent: "%sdk_root%\tools\bin\fspackagetool.exe" -nopause -forcesteam -outputtoseparateconsole "%~dp0png-2-ktx2.xml" >> "%log_file%"
+rem pause
+"%sdk_root%\tools\bin\fspackagetool.exe" -nopause -forcesteam -outputtoseparateconsole "%~dp0png-2-ktx2.xml"
+) else ( 
+rem Do not use the -forcesteam parameter (Microsoft version of sim)
+echo %DATE% %TIME% Command sent: "%sdk_root%\tools\bin\fspackagetool.exe" -nopause -outputtoseparateconsole "%~dp0png-2-ktx2.xml" >> "%log_file%"
+rem pause
 "%sdk_root%\tools\bin\fspackagetool.exe" -nopause -outputtoseparateconsole "%~dp0png-2-ktx2.xml"
+)
 cls
 echo Step 2 of 3: Generating KTX2 files...
 echo %DATE% %TIME% Step 2 of 3: Generating KTX2 files...  >> "%log_file%"
