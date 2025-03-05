@@ -18,16 +18,17 @@ A batch file to convert image files to Microsoft Flight Simulator 2024 KTX2 file
 1. Copy your PNG files in one of the folders ALBD (for albedo images), COMP (for composite images), DECAL (for decal images, can also accept TIF files), NORM (for normal images). Note these folders will be auto-created by the batch file if it cannot find them.
    - IMPORTANT: Ensure the image file names are correct so they will be converted to correctly named KTX2 and JSON files. For example, CUBV6_PRIMARYFUSELAGE_ALBD.PNG will generate CUBV6_PRIMARYFUSELAGE_ALBD.PNG.KTX2 and CUBV6_PRIMARYFUSELAGE_ALBD.PNG.KTX2.json
 2. From the command list, choose to generate the XML files for each image file. These XML files will be pre-populated with the right flags for each image type although you can edit them manually afterwards, before proceeding with the next step.
-3. From the command list, choose to generate the KTX2 files. This command is only available once each of your image files has a corresponding XML file.
-4. The script will launch the SDK and generate the KTX2 files. You should see a separate splash screen and console window. When these have disappeared press any key to finish. Your KTX2 and JSON files will be in a folder called OUTPUT, which is opened automatically in Windows Explorer.
-5. Batch file activity is logged in logfile.txt
+3. From the command list, choose OPTION 4 to generate the KTX2 files in an OUTPUT sub-folder. This command is only available once each of your image files has a corresponding XML file.
+4. From the command list, choose OPTION 5 to generate the KTX2 files in a designated aircraft livery texture folder.
+5. The script will launch the SDK and generate the KTX2 files. You should see a separate splash screen and console window. When these have disappeared press any key to finish. The location of your files will depend whether you chose OPTION 4 or OPTION 5, but the folder will be opened automatically in Windows Explorer.
+6. Batch file activity is comprehensively logged in logfile.txt
 
 ## What does the script do?
 
 For each of your PNG files, the script:
 1. Generates a [texture XML file](https://docs.flightsimulator.com/msfs2024/html/5_Content_Configuration/Textures/Texture_XML_Properties.htm) with suitable flags for Albedo, Composite, Normal or Decal image types (see below).
 2. Sends the PNG and accompanying XML file to the Microsoft Flight Simulator 2024 SDK package builder, which compiles a KTX2 file and accompanying JSON file.
-3. Copies the KTX2 and JSON file to the script's "OUTPUT" folder
+3. Copies the KTX2 and JSON file to the script's "OUTPUT" folder (when using OPTION 4) or a designated aircraft livery texture folder (when using OPTION 5).
 4. Cleans up any temporary files
 
 ### Albedo textures
