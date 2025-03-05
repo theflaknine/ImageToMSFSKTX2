@@ -10,7 +10,7 @@ A batch file to convert image files to Microsoft Flight Simulator 2024 KTX2 file
    - the path to the MSFS 2024 SDK, for example, `C:\MSFS 2024 SDK`. It expects a path without a trailing backslash and will trim it off if you do add it
    - which version of MSFS 2024 are you running: either MICROSOFT or STEAM
    - the path to MSFSLayoutGenerator. This is optional but will allow you to automatically update the layout.json file of your livery after creating the KTX2 files. Download MSFSLayoutGenerator [here](https://github.com/HughesMDflyer4/MSFSLayoutGenerator).
-   - the path to the TEXTURES folder of your current livery project. This is optional but will allow you to generate the KTX2 files in the correct place, without needing to move or copy them afterwards.
+   - the path to the TEXTURES folder of your current livery project. This is optional but will allow you to generate the KTX2 files in the correct place, without needing to move or copy them afterwards. Ensure you include the full path to the folder where the texture files should end up.
 4. The batch file will also create four folders ALBD, COMP, NORM and DECAL.
 
 ## Instructions - converting livery artwork to KTX2
@@ -20,7 +20,7 @@ A batch file to convert image files to Microsoft Flight Simulator 2024 KTX2 file
 2. From the command list, choose to generate the XML files for each image file. These XML files will be pre-populated with the right flags for each image type although you can edit them manually afterwards, before proceeding with the next step.
 3. From the command list you have two methods of generating KTX2 files
    - Choose OPTION 4 to generate the KTX2 files in an OUTPUT sub-folder. This command is only available once each of your image files has a corresponding XML file.
-   - Choose OPTION 5 to generate the KTX2 files in a designated aircraft livery texture folder.
+   - Choose OPTION 5 to generate the KTX2 files in a designated aircraft livery texture folder. This command is only avilable once each of your iamge files has a corresponding XML file, AND you have specified valid locations for MSFSLayoutgenertor.exe and an aircraft livery texture folder.
 6. The script will launch the SDK and generate the KTX2 files. You should see a separate splash screen and console window. When these have disappeared press any key to finish. The location of your files will depend whether you chose OPTION 4 or OPTION 5, but the folder will be opened automatically in Windows Explorer.
 7. Batch file activity is comprehensively logged in logfile.txt
 
