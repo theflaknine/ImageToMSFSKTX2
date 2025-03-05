@@ -19,8 +19,8 @@ A batch file to convert image files to Microsoft Flight Simulator 2024 KTX2 file
    - IMPORTANT: Ensure the image file names are correct so they will be converted to correctly named KTX2 and JSON files. For example, `CUBV6_PRIMARYFUSELAGE_ALBD.PNG` will generate `CUBV6_PRIMARYFUSELAGE_ALBD.PNG.KTX2` and `CUBV6_PRIMARYFUSELAGE_ALBD.PNG.KTX2.JSON`.
 2. From the command list, choose to generate the XML files for each image file. These XML files will be pre-populated with the right flags for each image type although you can edit them manually afterwards, before proceeding with the next step.
 3. From the command list you have two methods of generating KTX2 files
-- Choose OPTION 4 to generate the KTX2 files in an OUTPUT sub-folder. This command is only available once each of your image files has a corresponding XML file.
-- Choose OPTION 5 to generate the KTX2 files in a designated aircraft livery texture folder.
+  - Choose OPTION 4 to generate the KTX2 files in an OUTPUT sub-folder. This command is only available once each of your image files has a corresponding XML file.
+  - Choose OPTION 5 to generate the KTX2 files in a designated aircraft livery texture folder.
 6. The script will launch the SDK and generate the KTX2 files. You should see a separate splash screen and console window. When these have disappeared press any key to finish. The location of your files will depend whether you chose OPTION 4 or OPTION 5, but the folder will be opened automatically in Windows Explorer.
 7. Batch file activity is comprehensively logged in logfile.txt
 
