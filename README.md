@@ -16,7 +16,7 @@ A batch file to convert image files to Microsoft Flight Simulator 2024 KTX2 file
 
 ## Instructions - converting livery artwork to KTX2
 
-1. Copy your PNG files in one of the folders ALBD (for albedo images), COMP (for composite images), DECAL (for decal images, can also accept TIF files), NORM (for normal images). Note these folders will be auto-created by the batch file if it cannot find them.
+1. Copy your PNG / TIF files in one of the folders ALBD (for albedo images), COMP (for composite images), DECAL (for decal images), NORM (for normal images). Note these folders will be auto-created by the batch file if it cannot find them.
    - IMPORTANT: Ensure the image file names are correct so they will be converted to correctly named KTX2 and JSON files. For example, `CUBV6_PRIMARYFUSELAGE_ALBD.PNG` will generate `CUBV6_PRIMARYFUSELAGE_ALBD.PNG.KTX2` and `CUBV6_PRIMARYFUSELAGE_ALBD.PNG.KTX2.JSON`.
 2. From the command list, choose to generate the XML files for each image file. These XML files will be pre-populated with the right flags for each image type although you can edit them manually afterwards, before proceeding with the next step.
 3. From the command list you have two methods of generating KTX2 files
@@ -27,9 +27,9 @@ A batch file to convert image files to Microsoft Flight Simulator 2024 KTX2 file
 
 ## What does the script do?
 
-For each of your PNG files, the script:
+For each of your PNG / TIF files, the script:
 1. Generates a [texture XML file](https://docs.flightsimulator.com/msfs2024/html/5_Content_Configuration/Textures/Texture_XML_Properties.htm) with suitable flags for Albedo, Composite, Normal or Decal image types (see below).
-2. Sends the PNG and accompanying XML file to the Microsoft Flight Simulator 2024 SDK package builder, which compiles a KTX2 file and accompanying JSON file.
+2. Sends the PNG / TIF and accompanying XML file to the Microsoft Flight Simulator 2024 SDK package builder, which compiles a KTX2 file and accompanying JSON file.
 3. Copies the KTX2 and JSON file to the script's "OUTPUT" folder (when using OPTION 4) or a designated aircraft livery texture folder (when using OPTION 5).
 4. Cleans up any temporary files
 
@@ -52,7 +52,7 @@ For each of your PNG files, the script:
 - ForceNoAlpha: FALSE
 
 ### Decal textures
-*Used to apply details like labels and insignia on top of the base (albedo) texture. Currently, this uses the same flags as Albedo, but also handles TIF input.*
+*Used to apply details like labels and insignia on top of the base (albedo) texture. Currently, this uses the same flags as Albedo.*
 - BitmapSlot String: MTL_BITMAP_DECAL0
 - UserFlags: QUALITYHIGH
 - ForceNoAlpha: FALSE
