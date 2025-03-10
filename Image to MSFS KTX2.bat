@@ -14,7 +14,7 @@ for /F "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1)
 )
 CLS
 SET "log_file=%~dp0logfile.txt"
-SET "AppVersion=0.10"
+SET "AppVersion=0.11"
 SET "SimType=UNDEFINED"
 echo %DATE% %TIME% Started Image to MSFS KTX2 version %AppVersion% > "%log_file%"
 :MENU
@@ -211,10 +211,13 @@ set compCount=0
 set normCount=0
 set decalCount=0
 for %%f in ("%ALBD_dir%\*.png") do (set /a albdCount+=1)
+for %%f in ("%ALBD_dir%\*.tif") do (set /a albdCount+=1)
 echo %DATE% %TIME% Found !albdCount! albedo image files >> "%log_file%"
 for %%f in ("%COMP_dir%\*.png") do (set /a compCount+=1)
+for %%f in ("%COMP_dir%\*.tif") do (set /a compCount+=1)
 echo %DATE% %TIME% Found !compCount! composite image files >> "%log_file%"
 for %%f in ("%NORM_dir%\*.png") do (set /a normCount+=1)
+for %%f in ("%NORM_dir%\*.tif") do (set /a normCount+=1)
 echo %DATE% %TIME% Found !normCount! normal map image files >> "%log_file%"
 for %%f in ("%DECAL_dir%\*.png") do (set /a decalCount+=1)
 for %%f in ("%DECAL_dir%\*.tif") do (set /a decalCount+=1)
@@ -225,105 +228,148 @@ ECHO ===========================================================================
 ECHO.
 set count=0
 if !albdCount! gtr 0 (
-ECHO ----------------------------- ALBEDO PNG files -----------------------------
+ECHO ---------------------------- ALBEDO PNG / TIF files ------------------------------
 echo %DATE% %TIME% Checking albedo files >> "%log_file%"
 ) else (
-ECHO ----------------------------- ALBEDO PNG files -----------------------------
+ECHO.
+ECHO ---------------------------- ALBEDO PNG / TIF files ------------------------------
 echo None found in %ALBD_dir%
 echo.
 )
 FOR %%f in (".\ALBD\*.png") do (
-set "filename=%%~nf"
-echo %DATE% %TIME% ...Checking for matching XML for %%~ff  >> "%log_file%"
-if exist "%%~ff.xml" (
-echo %DATE% %TIME% ......Found matching XML for %%~ff  >> "%log_file%"
-ECHO [Has XML = OK]   %%f
-set /a countWithXML+=1
-) else (
-echo %DATE% %TIME% ......No matching XML for %%~ff  >> "%log_file%"
-rem echo %ESC%[0;91mRED%ESC%[0m
-ECHO [Has XML = %ESC%[0;91mFAIL%ESC%[0m] %%f
-set /a countWithoutXML+=1
+	set "filename=%%~nf"
+	echo %DATE% %TIME% ...Checking for matching XML for %%~ff  >> "%log_file%"
+	if exist "%%~ff.xml" (
+	echo %DATE% %TIME% ......Found matching XML for %%~ff  >> "%log_file%"
+	ECHO [Has XML = OK]   %%f
+	set /a countWithXML+=1
+	) else (
+	echo %DATE% %TIME% ......No matching XML for %%~ff  >> "%log_file%"
+	rem echo %ESC%[0;91mRED%ESC%[0m
+	ECHO [Has XML = %ESC%[0;91mFAIL%ESC%[0m] %%f
+	set /a countWithoutXML+=1
+	)
 )
+FOR %%f in (".\ALBD\*.tif") do (
+	set "filename=%%~nf"
+	echo %DATE% %TIME% ...Checking for matching XML for %%~ff  >> "%log_file%"
+	if exist "%%~ff.xml" (
+	echo %DATE% %TIME% ......Found matching XML for %%~ff  >> "%log_file%"
+	ECHO [Has XML = OK]   %%f
+	set /a countWithXML+=1
+	) else (
+	echo %DATE% %TIME% ......No matching XML for %%~ff  >> "%log_file%"
+	ECHO [Has XML = %ESC%[0;91mFAIL%ESC%[0m] %%f
+	set /a countWithoutXML+=1
+	)
 )
 if !compCount! gtr 0 (
 ECHO.
-ECHO --------------------------- COMPOSITE PNG files ----------------------------
+ECHO --------------------------- COMPOSITE PNG / TIF files ----------------------------
 echo %DATE% %TIME% Checking comp files >> "%log_file%"
 ) else (
-ECHO --------------------------- COMPOSITE PNG files ----------------------------
+ECHO.
+ECHO --------------------------- COMPOSITE PNG / TIF files ----------------------------
 echo None found in %COMP_dir%
 echo.
 )
 FOR %%f in (".\COMP\*.png") do (
-set "filename=%%~nf"
-echo %DATE% %TIME% ...Checking for matching XML for %%~ff  >> "%log_file%"
-if exist "%%~ff.xml" (
-echo %DATE% %TIME% ......Found matching XML for %%~ff  >> "%log_file%"
-ECHO [Has XML = OK]   %%f
-set /a countWithXML+=1
-) else (
-echo %DATE% %TIME% ......No matching XML for %%~ff  >> "%log_file%"
-ECHO [Has XML = %ESC%[0;91mFAIL%ESC%[0m] %%f
-set /a countWithoutXML+=1
+	set "filename=%%~nf"
+	echo %DATE% %TIME% ...Checking for matching XML for %%~ff  >> "%log_file%"
+	if exist "%%~ff.xml" (
+	echo %DATE% %TIME% ......Found matching XML for %%~ff  >> "%log_file%"
+	ECHO [Has XML = OK]   %%f
+	set /a countWithXML+=1
+	) else (
+	echo %DATE% %TIME% ......No matching XML for %%~ff  >> "%log_file%"
+	ECHO [Has XML = %ESC%[0;91mFAIL%ESC%[0m] %%f
+	set /a countWithoutXML+=1
+	)
 )
+FOR %%f in (".\COMP\*.tif") do (
+	set "filename=%%~nf"
+	echo %DATE% %TIME% ...Checking for matching XML for %%~ff  >> "%log_file%"
+	if exist "%%~ff.xml" (
+	echo %DATE% %TIME% ......Found matching XML for %%~ff  >> "%log_file%"
+	ECHO [Has XML = OK]   %%f
+	set /a countWithXML+=1
+	) else (
+	echo %DATE% %TIME% ......No matching XML for %%~ff  >> "%log_file%"
+	ECHO [Has XML = %ESC%[0;91mFAIL%ESC%[0m] %%f
+	set /a countWithoutXML+=1
+	)
 )
 if !normCount! gtr 0 (
 ECHO.
-ECHO ---------------------------- NORMAL PNG files ------------------------------
+ECHO ---------------------------- NORMAL PNG / TIF files ------------------------------
 echo %DATE% %TIME% Checking norm files >> "%log_file%"
 ) else (
-ECHO ---------------------------- NORMAL PNG files ------------------------------
+ECHO.
+ECHO ---------------------------- NORMAL PNG / TIF files ------------------------------
 echo None found in %NORM_dir%
 echo.
 )
 FOR %%f in (".\NORM\*.png") do (
-set "filename=%%~nf"
-echo %DATE% %TIME% ...Checking for matching XML for %%~ff  >> "%log_file%"
-if exist "%%~ff.xml" (
-echo %DATE% %TIME% ......Found matching XML for %%~ff  >> "%log_file%"
-ECHO [Has XML = OK]   %%f
-set /a countWithXML+=1
-) else (
-echo %DATE% %TIME% ......No matching XML for %%~ff  >> "%log_file%"
-ECHO [Has XML = %ESC%[0;91mFAIL%ESC%[0m] %%f
-set /a countWithoutXML+=1
+	set "filename=%%~nf"
+	echo %DATE% %TIME% ...Checking for matching XML for %%~ff  >> "%log_file%"
+	if exist "%%~ff.xml" (
+	echo %DATE% %TIME% ......Found matching XML for %%~ff  >> "%log_file%"
+	ECHO [Has XML = OK]   %%f
+	set /a countWithXML+=1
+	) else (
+	echo %DATE% %TIME% ......No matching XML for %%~ff  >> "%log_file%"
+	ECHO [Has XML = %ESC%[0;91mFAIL%ESC%[0m] %%f
+	set /a countWithoutXML+=1
+	)
 )
+FOR %%f in (".\NORM\*.tif") do (
+	set "filename=%%~nf"
+	echo %DATE% %TIME% ...Checking for matching XML for %%~ff  >> "%log_file%"
+	if exist "%%~ff.xml" (
+	echo %DATE% %TIME% ......Found matching XML for %%~ff  >> "%log_file%"
+	ECHO [Has XML = OK]   %%f
+	set /a countWithXML+=1
+	) else (
+	echo %DATE% %TIME% ......No matching XML for %%~ff  >> "%log_file%"
+	ECHO [Has XML = %ESC%[0;91mFAIL%ESC%[0m] %%f
+	set /a countWithoutXML+=1
+	)
 )
 if !decalCount! gtr 0 (
 ECHO.
-ECHO ------------------------ DECAL TIF and PNG files ---------------------------
+ECHO ---------------------------- DECAL TIF / PNG files -------------------------------
 echo %DATE% %TIME% Checking decal files >> "%log_file%"
 ) else (
-ECHO ------------------------ DECAL TIF and PNG files ---------------------------
+ECHO.
+ECHO ---------------------------- DECAL TIF / PNG files -------------------------------
 echo None found in %DECAL_dir%
 echo.
 )
 FOR %%f in (".\DECAL\*.png") do (
-set "filename=%%~nf"
-echo %DATE% %TIME% ...Checking for matching XML for %%~ff  >> "%log_file%"
-if exist "%%~ff.xml" (
-echo %DATE% %TIME% ......Found matching XML for %%~ff  >> "%log_file%"
-ECHO [Has XML = OK]   %%f
-set /a countWithXML+=1
-) else (
-echo %DATE% %TIME% ......No matching XML for %%~ff  >> "%log_file%"
-ECHO [Has XML = %ESC%[0;91mFAIL%ESC%[0m] %%f
-set /a countWithoutXML+=1
-)
+	set "filename=%%~nf"
+	echo %DATE% %TIME% ...Checking for matching XML for %%~ff  >> "%log_file%"
+	if exist "%%~ff.xml" (
+	echo %DATE% %TIME% ......Found matching XML for %%~ff  >> "%log_file%"
+	ECHO [Has XML = OK]   %%f
+	set /a countWithXML+=1
+	) else (
+	echo %DATE% %TIME% ......No matching XML for %%~ff  >> "%log_file%"
+	ECHO [Has XML = %ESC%[0;91mFAIL%ESC%[0m] %%f
+	set /a countWithoutXML+=1
+	)
 )
 FOR %%f in (".\DECAL\*.tif") do (
-set "filename=%%~nf"
-echo %DATE% %TIME% ...Checking for matching XML for %%~ff  >> "%log_file%"
-if exist "%%~ff.xml" (
-echo %DATE% %TIME% ......Found matching XML for %%~ff  >> "%log_file%"
-ECHO [Has XML = OK]   %%f
-set /a countWithXML+=1
-) else (
-echo %DATE% %TIME% ......No matching XML for %%~ff  >> "%log_file%"
-ECHO [Has XML = %ESC%[0;91mFAIL%ESC%[0m] %%f
-set /a countWithoutXML+=1
-)
+	set "filename=%%~nf"
+	echo %DATE% %TIME% ...Checking for matching XML for %%~ff  >> "%log_file%"
+	if exist "%%~ff.xml" (
+	echo %DATE% %TIME% ......Found matching XML for %%~ff  >> "%log_file%"
+	ECHO [Has XML = OK]   %%f
+	set /a countWithXML+=1
+	) else (
+	echo %DATE% %TIME% ......No matching XML for %%~ff  >> "%log_file%"
+	ECHO [Has XML = %ESC%[0;91mFAIL%ESC%[0m] %%f
+	set /a countWithoutXML+=1
+	)
 )
 set /a totalCount=countWithXML+countWithoutXML
 call :CHECK5 !countWithoutXML!
@@ -394,15 +440,29 @@ goto CONFIGMENU
 
 :CREATEXMLS
 echo %DATE% %TIME% User chose option 2 >> "%log_file%"
-echo %DATE% %TIME% Creating missing XMLs for albedo files >> "%log_file%"
+echo %DATE% %TIME% Creating missing XMLs for albedo PNG files >> "%log_file%"
 for %%f in ("%ALBD_dir%\*.png") do (
 if not exist "%%~dpnf.xml" (
 echo %DATE% %TIME% ...Creating XML file for %%~dpnf >> "%log_file%"
 echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
 )
 )
-echo %DATE% %TIME% Creating missing XMLs for composite files >> "%log_file%"
+echo %DATE% %TIME% Creating missing XMLs for albedo TIF files >> "%log_file%"
+for %%f in ("%ALBD_dir%\*.tif") do (
+if not exist "%%~dpnf.xml" (
+echo %DATE% %TIME% ...Creating XML file for %%~dpff >> "%log_file%"
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
+)
+)
+echo %DATE% %TIME% Creating missing XMLs for composite PNG files >> "%log_file%"
 for %%f in ("%COMP_dir%\*.png") do (
+if not exist "%%~dpnf.xml" (
+echo %DATE% %TIME% ...Creating XML file for %%~dpff >> "%log_file%"
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_METAL_ROUGH_AO^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^<ForceNoAlpha^>true^</ForceNoAlpha^>^</BitmapConfiguration^> > "%%~dpff.xml"
+)
+)
+echo %DATE% %TIME% Creating missing XMLs for composite TIF files >> "%log_file%"
+for %%f in ("%COMP_dir%\*.tif") do (
 if not exist "%%~dpnf.xml" (
 echo %DATE% %TIME% ...Creating XML file for %%~dpff >> "%log_file%"
 echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_METAL_ROUGH_AO^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^<ForceNoAlpha^>true^</ForceNoAlpha^>^</BitmapConfiguration^> > "%%~dpff.xml"
@@ -410,6 +470,13 @@ echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_METAL_ROUGH_AO^</BitmapSlot
 )
 echo %DATE% %TIME% Creating missing XMLs for normal files >> "%log_file%"
 for %%f in ("%NORM_dir%\*.png") do (
+if not exist "%%~dpnf.xml" (
+echo %DATE% %TIME% ...Creating XML file for %%~dpff >> "%log_file%"
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_NORMAL^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
+)
+)
+echo %DATE% %TIME% Creating missing XMLs for normal TIF files >> "%log_file%"
+for %%f in ("%NORM_dir%\*.tif") do (
 if not exist "%%~dpnf.xml" (
 echo %DATE% %TIME% ...Creating XML file for %%~dpff >> "%log_file%"
 echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_NORMAL^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
@@ -433,26 +500,42 @@ cls
 goto MENU
 :RECREATEXMLS
 echo %DATE% %TIME% User chose option 3 >> "%log_file%"
-echo %DATE% %TIME% Recreating XMLs for albedo files >> "%log_file%"
+echo %DATE% %TIME% Recreating XMLs for albedo PNG files >> "%log_file%"
 for %%f in ("%ALBD_dir%\*.png") do (
 echo %DATE% %TIME% ...Creating XML file for %%~dpff >> "%log_file%"
 echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
 )
-echo %DATE% %TIME% Recreating XMLs for composite files >> "%log_file%"
+echo %DATE% %TIME% Recreating XMLs for albedo TIF files >> "%log_file%"
+for %%f in ("%ALBD_dir%\*.tif") do (
+echo %DATE% %TIME% ...Creating XML file for %%~dpff >> "%log_file%"
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
+)
+echo %DATE% %TIME% Recreating XMLs for composite PNG files >> "%log_file%"
 for %%f in ("%COMP_dir%\*.png") do (
 echo %DATE% %TIME% ...Creating XML file for %%~dpff >> "%log_file%"
 echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_METAL_ROUGH_AO^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^<ForceNoAlpha^>true^</ForceNoAlpha^>^</BitmapConfiguration^> > "%%~dpff.xml"
 )
-echo %DATE% %TIME% Recreating XMLs for normal files >> "%log_file%"
+echo %DATE% %TIME% Recreating XMLs for composite TIF files >> "%log_file%"
+for %%f in ("%COMP_dir%\*.tif") do (
+echo %DATE% %TIME% ...Creating XML file for %%~dpff >> "%log_file%"
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_METAL_ROUGH_AO^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^<ForceNoAlpha^>true^</ForceNoAlpha^>^</BitmapConfiguration^> > "%%~dpff.xml"
+)
+echo %DATE% %TIME% Recreating XMLs for normal PNG files >> "%log_file%"
 for %%f in ("%NORM_dir%\*.png") do (
 echo %DATE% %TIME% ...Creating XML file for %%~dpff >> "%log_file%"
 echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_NORMAL^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
 )
-echo %DATE% %TIME% Recreating XMLs for decal files >> "%log_file%"
+echo %DATE% %TIME% Recreating XMLs for normal TIF files >> "%log_file%"
+for %%f in ("%NORM_dir%\*.tif") do (
+echo %DATE% %TIME% ...Creating XML file for %%~dpff >> "%log_file%"
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_NORMAL^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
+)
+echo %DATE% %TIME% Recreating XMLs for decal PNG files >> "%log_file%"
 for %%f in ("%DECAL_dir%\*.png") do (
 echo %DATE% %TIME% ...Creating XML file for %%~dpff >> "%log_file%"
 echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
 )
+echo %DATE% %TIME% Recreating XMLs for decal TIF files >> "%log_file%"
 for %%f in ("%DECAL_dir%\*.tif") do (
 echo %DATE% %TIME% ...Creating XML file for %%~dpff >> "%log_file%"
 echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
@@ -567,7 +650,7 @@ echo %DATE% %TIME% Create Package Definition XML png-2-ktx2.xml in PackageDefini
 echo ^<?xml version="1.0" encoding="utf-8"?^>^<AssetPackage Version="0.1.0"^>^<ItemSettings^>^<ContentType^>AIRCRAFT^</ContentType^>^<Title^>PNG TO KTX2 CONVERTER^</Title^>^<Manufacturer^>FlakNine^</Manufacturer^>^<Creator^>FlakNine^</Creator^>^</ItemSettings^>^<Flags^>^<VisibleInStore^>true^</VisibleInStore^>^<CanBeReferenced^>true^</CanBeReferenced^>^</Flags^>^<AssetGroups^>^<AssetGroup Name="PNG TO KTX2 CONVERTER"^>^<Type^>ModularSimObject^</Type^>^<Flags^>^<FSXCompatibility^>false^</FSXCompatibility^>^</Flags^>^<AssetDir^>PackageSources\SimObjects\Airplanes\png-2-ktx2\^</AssetDir^>^<OutputDir^>SimObjects\Airplanes\png-2-ktx2\^</OutputDir^>^</AssetGroup^>^</AssetGroups^>^</AssetPackage^> > "%~dp0\PackageDefinitions\png-2-ktx2.xml"
 echo %DATE% %TIME% Create project XML png-2-ktx2.xml >> "%log_file%"
 echo ^<?xml version="1.0" encoding="utf-8"?^>^<Project Version="2" Name="PNG TO KTX2 CONVERTER" FolderName="Packages" MetadataFolderName="PackagesMetadata"^>^<OutputDirectory^>.^</OutputDirectory^>^<TemporaryOutputDirectory^>_PackageInt^</TemporaryOutputDirectory^>^<Packages^>^<Package^>PackageDefinitions\png-2-ktx2.xml^</Package^>^</Packages^>^</Project^> > "%~dp0\png-2-ktx2.xml"
-rem Copy Albedo PNG and XML files
+rem Copy Albedo PNG TIF and XML files
 echo %DATE% %TIME% For each PNG in !ALBD_dir!... >> "%log_file%"
 for %%f in ("%ALBD_dir%\*.png") do (
 if exist "%%~dpnf.png" (
@@ -577,7 +660,16 @@ echo %DATE% %TIME% Copy "%%~dpnf.png" to "%~dp0PackageSources\SimObjects\Airplan
 copy /y "%%~dpnf.png" "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
 )
 )
-rem Copy Composite PNG and XML files
+echo %DATE% %TIME% For each TIF in !ALBD_dir!... >> "%log_file%"
+for %%f in ("%ALBD_dir%\*.tif") do (
+if exist "%%~dpnf.tif" (
+echo %DATE% %TIME% ...Copy "%%~dpff.xml" to "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
+copy /y "%%~dpff.xml" "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
+echo %DATE% %TIME% ...Copy "%%~dpnf.tif" to "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
+copy /y "%%~dpnf.tif" "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
+)
+)
+rem Copy Composite PNG TIF and XML files
 echo %DATE% %TIME% For each PNG in !COMP_dir!... >> "%log_file%"
 for %%f in ("%COMP_dir%\*.png") do (
 if exist "%%~dpnf.png" (
@@ -587,7 +679,16 @@ echo %DATE% %TIME% ...Copy "%%~dpnf.png" to "%~dp0PackageSources\SimObjects\Airp
 copy /y "%%~dpnf.png" "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
 )
 )
-rem Normal PNG and XML files
+echo %DATE% %TIME% For each TIF in !COMP_dir!... >> "%log_file%"
+for %%f in ("%COMP_dir%\*.tif") do (
+if exist "%%~dpnf.tif" (
+echo %DATE% %TIME% ...Copy "%%~dpff.xml" to "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
+copy /y "%%~dpff.xml" "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
+echo %DATE% %TIME% ...Copy "%%~dpnf.tif" to "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
+copy /y "%%~dpnf.tif" "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
+)
+)
+rem Normal PNG TIF and XML files
 echo %DATE% %TIME% For each PNG in !NORM_dir!... >> "%log_file%"
 for %%f in ("%NORM_dir%\*.png") do (
 if exist "%%~dpnf.png" (
@@ -595,6 +696,15 @@ echo %DATE% %TIME% ...Copy "%%~dpff.xml" to "%~dp0PackageSources\SimObjects\Airp
 copy /y "%%~dpff.xml" "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
 echo %DATE% %TIME% ...Copy "%%~dpnf.png" to "..\PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
 copy /y "%%~dpnf.png" "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
+)
+)
+echo %DATE% %TIME% For each TIF in !NORM_dir!... >> "%log_file%"
+for %%f in ("%NORM_dir%\*.tif") do (
+if exist "%%~dpnf.tif" (
+echo %DATE% %TIME% ...Copy "%%~dpff.xml" to "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
+copy /y "%%~dpff.xml" "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
+echo %DATE% %TIME% ...Copy "%%~dpnf.tif" to "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
+copy /y "%%~dpnf.tif" "%~dp0PackageSources\SimObjects\Airplanes\png-2-ktx2\common\texture\" >> "%log_file%"
 )
 )
 rem Decal PNG TIF and XML files
@@ -660,7 +770,7 @@ rem placeholder for setting output path to Tex_path
 set OutputPath=!Tex_path!
 ) else (
 rem placeholder for setting output path to "%~dp0OUTPUT"
-set OutputPath="%~dp0OUTPUT"
+set OutputPath=%~dp0OUTPUT
 )
 rem echo %OutputPath%
 echo %DATE% %TIME% Creating folder if it doesn't exist: "%OutputPath%" >> "%log_file%"
@@ -683,7 +793,7 @@ rem run MSFSLayoutGenerator.exe
 "%LG_path%\MSFSLayoutGenerator.exe" "%layoutPath%"
 set OutputPath=!Tex_path!
 ) 
-echo %DATE% %TIME% Open the the folder "%OutputPath%" >> "%log_file%"
+echo %DATE% %TIME% Open the folder "%OutputPath%" >> "%log_file%"
 start "" "%OutputPath%"
 echo %DATE% %TIME% End of script >> "%log_file%"
 goto EOF
