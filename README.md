@@ -4,7 +4,7 @@ A batch file to convert image files to Microsoft Flight Simulator 2024 KTX2 file
 
 ## Instructions - setup
 
-1. From the Releases area on this page, download the latest release of my script and extract it.
+1. From the [Releases](https://github.com/theflaknine/ImageToMSFSKTX2/releases) area of the ImageToMSFSKTX2 repo, download the latest release of my script and extract it.
 2. Copy the batch file to a folder of your choice. It doesn't matter where this batch file is located, it'll create the necessary folders relative to itself. You may want to add a copy to each livery project artwork folder.
 3. You must have the Microsoft Flight Simulator 2024 SDK installed.
 4. When you first run the batch file it will prompt you for several settings:
