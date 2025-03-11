@@ -4,15 +4,16 @@ A batch file to convert image files to Microsoft Flight Simulator 2024 KTX2 file
 
 ## Instructions - setup
 
-1. Copy the batch file to a folder of your choice. It doesn't matter where this batch file is located, it'll create the necessary folders relative to itself. You may want to add a copy to each livery project artwork folder.
-2. You must have the Microsoft Flight Simulator 2024 SDK installed.
-3. When you first run the batch file it will prompt you for several settings:
+1. From the Releases area on this page, download the latest release of my script and extract it.
+2. Copy the batch file to a folder of your choice. It doesn't matter where this batch file is located, it'll create the necessary folders relative to itself. You may want to add a copy to each livery project artwork folder.
+3. You must have the Microsoft Flight Simulator 2024 SDK installed.
+4. When you first run the batch file it will prompt you for several settings:
    - the path to the MSFS 2024 SDK, for example, `C:\MSFS 2024 SDK`. It expects a path without a trailing backslash and will trim it off if you do add it
    - which version of MSFS 2024 are you running: either MICROSOFT or STEAM
    - the path to MSFSLayoutGenerator. This is optional but will allow you to automatically update the layout.json file of your livery after creating the KTX2 files. Download MSFSLayoutGenerator [here](https://github.com/HughesMDflyer4/MSFSLayoutGenerator).
       - **NOTE: currently this doesn't work with the newer "modular" type of MSFS 2024 liveries;** it only works with the non-modular MSFS 2024 liveries. I'll fix this soon.
    - the path to the TEXTURES folder of your current livery project. This is optional but will allow you to generate the KTX2 files in the correct place, without needing to move or copy them afterwards. Ensure you include the full path to the folder where the texture files should end up.
-4. The batch file will also create four folders ALBD, COMP, NORM and DECAL.
+5. The batch file will also create four folders ALBD, COMP, NORM and DECAL.
 
 ## Instructions - converting livery artwork to KTX2
 
