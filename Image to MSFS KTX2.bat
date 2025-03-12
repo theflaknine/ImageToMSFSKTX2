@@ -14,7 +14,8 @@ for /F "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1)
 )
 CLS
 SET "log_file=%~dp0logfile.txt"
-SET "AppVersion=0.11"
+SET "CurrentAppVersion=0.12"
+SET "AppVersion=%CurrentAppVersion%"
 SET "SimType=UNDEFINED"
 echo %DATE% %TIME% Started Image to MSFS KTX2 version %AppVersion% > "%log_file%"
 :MENU
@@ -90,18 +91,82 @@ Goto CONFIGMENU
 echo %DATE% %TIME% Prompted user for path to Aircraft TEXTURE folder >> "%log_file%"
 cls
 echo Enter the path for the Aircraft TEXTURE folder, e.g. G:\MyAircraft\SimObjects\Airplanes\MyAircraft\texture.myAircraft.
+echo IMPORTANT: The path length plus the filenames of the texture files must not exceed 256 characters^^!
 set /p Tex_path=Path: 
 echo %DATE% %TIME% User entered !Tex_path! >> "%log_file%"
 set "last_char=!Tex_path:~-1!"
-echo %DATE% %TIME% Last character is 0!last_char! >> "%log_file%"
+echo %DATE% %TIME% Last character is !last_char! >> "%log_file%"
 if "!last_char!"=="\" (
 	echo %DATE% %TIME% Removing trailing backslash >> "%log_file%"
 	SET "Tex_path=!Tex_path:~0,-1!"
 )
-set "layoutPath=!Tex_path!\..\..\..\..\layout.json"
-set "manifestPath=!Tex_path!\..\..\..\..\manifest.json"
+CLS
+rem Attempt to find layout.json
+call :READLAYOUT
+rem Read title from manifest.json
+CALL :READMANIFEST	
+pause	
+rem Write to settings file
+call :WRITESETTINGS
+Goto CONFIGMENU
+
+:READLAYOUT
+for /f %%a in ('echo prompt $E^| cmd') do set "ESC=%%a"
+echo Aircraft texture path:%ESC%[0;93m !Tex_path! %ESC%[0m
+echo %DATE% %TIME% Started function READLAYOUT >> "%log_file%"
+echo %DATE% %TIME% Check if layout.json can be found in either expected location >> "%log_file%"
+if exist !Tex_path!\..\..\..\..\layout.json (
+	set "layoutPath=!Tex_path!\..\..\..\..\layout.json"
+	rem Convert layoutpath from relative to absolute path
+	CALL :NORMALIZEPATH "!layoutPath!"
+	set "layoutpath=!retval!"
+	echo %DATE% %TIME% !layoutPath! exists, this is a non-modular MSFS 2024 aircraft  >> "%log_file%"
+	echo Found:%ESC%[0;93m !layoutPath! %ESC%[0m
+	set "manifestPath=!Tex_path!\..\..\..\..\manifest.json"
+	rem Convert manifestpath from relative to absolute path
+	CALL :NORMALIZEPATH "!manifestPath!"
+	set "manifestpath=!retval!"
+	echo %DATE% %TIME% Expected location for manifest.json is !manifestPath!  >> "%log_file%"
+	echo Folder structure:%ESC%[0;93m Non-modular MSFS 2024 aircraft %ESC%[0m
+) else if exist !Tex_path!\..\..\..\..\..\..\..\layout.json (
+	set "layoutPath=!Tex_path!\..\..\..\..\..\..\..\layout.json"
+	rem Convert layoutpath from relative to absolute path
+	CALL :NORMALIZEPATH "!layoutPath!"
+	set "layoutpath=!retval!"
+	echo %DATE% %TIME% !layoutPath! exists, this is a modular MSFS 2024 aircraft  >> "%log_file%"
+	echo Found:%ESC%[0;93m !layoutPath! %ESC%[0m
+	set "manifestPath=!Tex_path!\..\..\..\..\..\..\..\manifest.json"
+	rem Convert manifestpath from relative to absolute path
+	CALL :NORMALIZEPATH "!manifestPath!"
+	set "manifestpath=!retval!"
+	echo %DATE% %TIME% Expected location for manifest.json is !manifestPath!  >> "%log_file%"
+	echo Folder structure:%ESC%[0;93m Modular MSFS 2024 aircraft %ESC%[0m
+) else (
+cls
+echo %DATE% %TIME% Could not find layout.json  >> "%log_file%"
+echo %ESC%[0;91mCannot find layout.json, please check your livery folder structure and content is valid. %ESC%[0m
+echo See MSFS 2024 SDK documentation for more details on the expected folder structure.
+echo Press any key to return to the Configuration Menu...
+pause >NUL
+GOTO CONFIGMENU
+)
+echo %DATE% %TIME% Ended function READLAYOUT >> "%log_file%"
+Exit /B
+
+:NORMALIZEPATH
+  SET RETVAL=%~f1
+  rem echo normalized path is %RETVAL%
+  rem pause
+  EXIT /B
+
+:READMANIFEST
+for /f %%a in ('echo prompt $E^| cmd') do set "ESC=%%a"
+echo %DATE% %TIME% Started function READMANIFEST >> "%log_file%"
+rem Read the livery title from manifest.json, which should be in the same folder as layout.json
+echo %DATE% %TIME% Check if !manifestPath! exists >> "%log_file%"
 if exist !manifestPath! (
-			echo Found manifest.json OK
+			echo Found:%ESC%[0;93m !manifestPath!  %ESC%[0m
+			echo Reading manifest.json...
 				set "searchKey="title""
 				for /f "delims=" %%a in ('type "!manifestPath!" ^| findstr /c:"\"title\""') do (
 				set "line=%%a"
@@ -113,14 +178,19 @@ if exist !manifestPath! (
 				if "!LiveryTitle:~-1!"=="," (
 				set "LiveryTitle=!LiveryTitle:~0,-1!"
 				)
-				echo Successfully found the livery titled: !LiveryTitle!
-			Pause
+				echo Successfully found the livery titled:%ESC%[0;93m !LiveryTitle! %ESC%[0m
+				echo %DATE% %TIME% Found livery titled: !LiveryTitle! >> "%log_file%"
+			rem Pause
+			) else (
+			echo %ESC%[0;91mCannot find: !manifestPath!, please check your livery folder structure and content is valid. %ESC%[0m
+			echo %DATE% %TIME% Could not find !manifestPath! >> "%log_file%"
 			)
-call :WRITESETTINGS
-Goto CONFIGMENU
+echo %DATE% %TIME% Ended function READMANIFEST >> "%log_file%"
+Exit /B
 
 :WRITESETTINGS
 rem Write variables to settings files
+SET "AppVersion=%CurrentAppVersion%"
 echo %DATE% %TIME% Updating the settings file >> "%log_file%"
 (
 echo AppVersion=%AppVersion%
@@ -130,6 +200,24 @@ echo LG_path=!LG_path!
 echo Tex_path=!Tex_path!
 )>userConfig.ini 
 Exit /B
+
+
+
+rem Subroutine to calculate the length of a string
+:strlen
+setlocal enabledelayedexpansion
+set "string=%~2"
+set /a length=0
+
+:strlenLoop
+if defined string (
+    set "string=!string:~1!"
+    set /a length+=1
+    goto :strlenLoop
+)
+rem echo %length%
+endlocal & set "%~1=%length%"
+exit /b
 
 
 :READSETTINGS
@@ -162,13 +250,6 @@ echo %DATE% %TIME% Read settings from settings file: SimType is %SimType% >> "%l
 echo %DATE% %TIME% Read settings from settings file: sdk_root is %sdk_root% >> "%log_file%"
 echo %DATE% %TIME% Read settings from settings file: lg_path is !lg_path! >> "%log_file%"
 echo %DATE% %TIME% Read settings from settings file: tex_path is !tex_path! >> "%log_file%"
-
-
-rem ) else (
-
-rem echo !new_path!>userConfig.ini
-rem echo %DATE% %TIME% SDK path set to !new_path! >> "%log_file%"
-rem set "sdk_root=!new_path!"
 
 if exist "!sdk_root!\version.txt" (
 set /p sdkVer=<!sdk_root!\version.txt
@@ -210,6 +291,7 @@ set albdCount=0
 set compCount=0
 set normCount=0
 set decalCount=0
+set maxPathLength=0
 for %%f in ("%ALBD_dir%\*.png") do (set /a albdCount+=1)
 for %%f in ("%ALBD_dir%\*.tif") do (set /a albdCount+=1)
 echo %DATE% %TIME% Found !albdCount! albedo image files >> "%log_file%"
@@ -222,9 +304,12 @@ echo %DATE% %TIME% Found !normCount! normal map image files >> "%log_file%"
 for %%f in ("%DECAL_dir%\*.png") do (set /a decalCount+=1)
 for %%f in ("%DECAL_dir%\*.tif") do (set /a decalCount+=1)
 echo %DATE% %TIME% Found !decalCount! decal image files >> "%log_file%"
+
+cls
+
 echo %DATE% %TIME% Display list of files >> "%log_file%"
-ECHO                    IMAGE TO MSFS KTX2 CONVERTER v%AppVersion%                      
-ECHO ============================================================================
+ECHO                    IMAGE TO MSFS KTX2 CONVERTER v%CurrentAppVersion%                      
+ECHO ==================================================================================
 ECHO.
 set count=0
 if !albdCount! gtr 0 (
@@ -572,49 +657,60 @@ exit /B
 
 :CREATEKTX2
 cls
+rem Determine the length of the texture path, if it's defined
+rem Set the string (path) to calculate the length for
+set string=!tex_Path!
+rem Initialize length counter
+set /a PathLength=0
+
+rem Loop through the string character by character
+:calculate_length
+if not "%string%"=="" (
+    set "string=!string:~1!"
+    set /a PathLength+=1
+    goto :calculate_length
+)
+
+rem Determine the length of filenames and update maxPathLength
+Echo Analysing texture image files...
+for %%f in ("%ALBD_dir%\*.png" "%ALBD_dir%\*.tif" "%COMP_dir%\*.png" "%COMP_dir%\*.tif" "%NORM_dir%\*.png" "%NORM_dir%\*.tif" "%DECAL_dir%\*.png" "%DECAL_dir%\*.tif") do (
+    set "filename=%%~nxf"
+    call :strlen stringlength !filename!
+	rem echo !filename!
+	rem echo !stringlength!
+	rem pause
+	if !stringlength! gtr !maxPathLength! (set maxPathLength=!stringlength!)
+	echo Longest filename length is: !maxPathLength! chars >> "%log_file%"
+	rem echo.
+)
+cls
+rem echo The max path length is: %maxPathLength%
+rem Display the length of the string
+rem echo The length of the string is: %PathLength%
+
+rem Combine texture path and longest file name, then add 12 chars
+set /a TotalPathLength = %maxPathLength%+%PathLength%+12
+if %TotalPathLength% gtr 260 (
+echo One or more of the texture file names will result in a path length of %TotalPathLength% characters. 
+echo The KTX2 generation will fail for paths over 260 characters. Use a shorter path for your aircraft texture path.
+echo Press any key to return to the main menu...
+pause >nul
+goto MENU
+)
+
 IF !M!==5 (
 	echo %DATE% %TIME% User chose option 5 >> "%log_file%"
 	echo %DATE% %TIME% Check if "%LG_path%\MSFSLayoutGenerator.exe" exists >> "%log_file%"
 		if exist "%LG_path%\MSFSLayoutGenerator.exe" (
 		echo %DATE% %TIME% "%LG_path%\MSFSLayoutGenerator.exe" found OK >> "%log_file%"
-			rem Find and read manifest.json 
-			set "layoutPath=!Tex_path!\..\..\..\..\layout.json"
-			set "manifestPath=!Tex_path!\..\..\..\..\manifest.json"
-			echo %DATE% %TIME% Layout path: !layoutPath! >> "%log_file%"
-			echo %DATE% %TIME% Manifest path: !manifestPath! >> "%log_file%"
-			if exist !layoutPath! (
-			echo Found layout.json OK
-			) else (
-			echo Could not find layout.json, press any key to return to menu
-			pause >nul
-			goto MENU
-			)
-			if exist !manifestPath! (
-			echo Found manifest.json OK
-				set "searchKey="title""
-				for /f "delims=" %%a in ('type "!manifestPath!" ^| findstr /c:"\"title\""') do (
-				set "line=%%a"
-				for /f "tokens=2 delims=:" %%b in ("!line!") do (
-				set "value=%%b"
-				)
-				)
-				rem  Remove leading and trailing spaces, quotes, and commas
-				if "!value:~-1!"=="," (
-				set "value=!value:~0,-1!"
-				)
-				echo Successfully found the livery titled: !value!
-				echo Found %LG_path%\MSFSLayoutGenerator.exe OK.
-			Pause
-			) else (
-			echo Could not find manifest.json, press any key to return to menu
-			pause >nul
-			goto MENU
-			
-			)
+		CALL :READLAYOUT
+		CALL :READMANIFEST
+		echo.
+		echo Press any key to proceed with KTX2 creation, or close this window to cancel.
+		pause >nul
 		) else (
 		echo %DATE% %TIME% "%LG_path%\MSFSLayoutGenerator.exe" not found >> "%log_file%"
 		ECHO Could not find MSFSLayoutGenerator.exe at %LG_path%. Check the specified path in the configuration menu.
-		goto MENU
 		)
 	) else (
 	echo %DATE% %TIME% User chose option 4 >> "%log_file%"
@@ -755,11 +851,13 @@ if "%ERRORLEVEL%"=="0" (
 )
 cls
 IF !M!==5 (
-echo Step 3 of 3: Completed generation of KTX2 files. Press any key to clean up temporary files, update the livery layout.json and finish.
+echo Step 3 of 3: Completed generation of KTX2 files. 
+echo Press any key to clean up temporary files, update the livery layout.json and finish.
 echo %DATE% %TIME% Step 3 of 3: Completed generation of KTX2 files. Press any key to clean up temporary files and finish.  >> "%log_file%"
 color 2f
 ) else (
-echo Step 3 of 3: Completed generation of KTX2 files. Press any key to clean up temporary files and finish.
+echo Step 3 of 3: Completed generation of KTX2 files. 
+echo Press any key to clean up temporary files and finish.
 echo %DATE% %TIME% Step 3 of 3: Completed generation of KTX2 files. Press any key to clean up temporary files and finish.  >> "%log_file%"
 color 2f
 )
@@ -786,7 +884,7 @@ rmdir /s /q "Packages"
 echo %DATE% %TIME% Delete project file png-2-ktx2.xml  >> "%log_file%"
 del /q png-2-ktx2.xml 
 IF !M!==5 (
-echo Ready to run MSFSLayoutGenerator
+echo Running MSFSLayoutGenerator.exe on "%layoutPath%"
 echo %DATE% %TIME% Run MSFSLayoutGenerator.exe on "%layoutPath%" >> "%log_file%"
 echo %DATE% %TIME% Command: "%LG_path%\MSFSLayoutGenerator.exe" "%layoutPath%" >> "%log_file%"
 rem run MSFSLayoutGenerator.exe
@@ -795,6 +893,8 @@ set OutputPath=!Tex_path!
 ) 
 echo %DATE% %TIME% Open the folder "%OutputPath%" >> "%log_file%"
 start "" "%OutputPath%"
+echo Done! This window will close in 20s, or press any key to close it now...
+timeout /t 20 >nul
 echo %DATE% %TIME% End of script >> "%log_file%"
 goto EOF
 :REFRESH
