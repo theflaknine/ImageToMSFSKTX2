@@ -10,9 +10,9 @@ A batch file to convert image files to Microsoft Flight Simulator 2024 KTX2 file
 4. When you first run the batch file it will prompt you for several settings:
    - the path to the MSFS 2024 SDK, for example, `C:\MSFS 2024 SDK`. It expects a path without a trailing backslash and will trim it off if you do add it
    - which version of MSFS 2024 are you running: either MICROSOFT or STEAM
-   - the path to MSFSLayoutGenerator. This is optional but will allow you to automatically update the layout.json file of your livery after creating the KTX2 files. Download MSFSLayoutGenerator [here](https://github.com/HughesMDflyer4/MSFSLayoutGenerator).
-      - **NOTE: currently this doesn't work with the newer "modular" type of MSFS 2024 liveries;** it only works with the non-modular MSFS 2024 liveries. I'll fix this soon.
+   - the path to MSFSLayoutGenerator. This is optional but will allow you to automatically update the layout.json file of your livery after creating the KTX2 files; this functionality also requires you to set the TEXTURES folder as described below. Download MSFSLayoutGenerator [here](https://github.com/HughesMDflyer4/MSFSLayoutGenerator).
    - the path to the TEXTURES folder of your current livery project. This is optional but will allow you to generate the KTX2 files in the correct place, without needing to move or copy them afterwards. Ensure you include the full path to the folder where the texture files should end up.
+      - the script contains logic to identify whether your livery project is for a MODULAR or NON-MODULAR MSFS 2024 aircraft, and will locate the layout.json file accordingly.
 5. The batch file will also create four folders ALBD, COMP, NORM and DECAL.
 
 ## Instructions - converting livery artwork to KTX2
