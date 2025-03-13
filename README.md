@@ -1,6 +1,6 @@
 # ImageToMSFSKTX2
 
-A batch file to convert image files to Microsoft Flight Simulator 2024 KTX2 files, with accompanying JSONs. This is a script I've started out for my own use, but spent some time to make it a little more user friendly to help out other livery creators converting images to the new KTX2 format.
+A batch file to convert image files to Microsoft Flight Simulator 2024 KTX2 files, with accompanying JSONs. This is a script I've started out for my own use, but spent time adding new features, error handling and improving usability, to help out other livery creators converting images to the new KTX2 format.
 
 ## Instructions - setup
 
