@@ -39,8 +39,8 @@ For each of your PNG / TIF files, the script:
 ### Albedo textures
 *Defines the base colour of your texture. If you are new to livery painting and aren't sure what type of texture you've created, it's most likely an albedo texture.*
 - BitmapSlot String: MTL_BITMAP_DECAL0
-- UserFlags: QUALITYHIGH
-- ForceNoAlpha: FALSE
+- UserFlags: QUALITYHIGH (starting with v0.13, this flag can be modified in the settings page)
+- ForceNoAlpha: FALSE (starting with v0.13, this flag can be modified in the settings page)
 
 ### Composite textures
 *A composite image where the red channel defines ambient occlusion, green channel defines roughness, blue defines metallicness.*
