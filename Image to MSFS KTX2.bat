@@ -14,7 +14,7 @@ for /F "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1)
 )
 CLS
 SET "log_file=%~dp0logfile.txt"
-SET "CurrentAppVersion=0.12"
+SET "CurrentAppVersion=0.13"
 SET "AppVersion=%CurrentAppVersion%"
 SET "SimType=UNDEFINED"
 echo %DATE% %TIME% Started Image to MSFS KTX2 version %AppVersion% > "%log_file%"
@@ -28,6 +28,8 @@ if not exist "%settings_file%" (
 	SET "sdkVer=UNDEFINED"
 	SET "LG_path=UNDEFINED"
 	SET "Tex_path=UNDEFINED"
+	SET "HQ_Flag=ON"
+	SET "NoAlpha_Flag=OFF"
 	GOTO CONFIGMENU
 	) else (
 	GOTO READSETTINGS
@@ -87,6 +89,31 @@ if "!last_char!"=="\" (
 call :WRITESETTINGS
 Goto CONFIGMENU
 
+:HQFLAGTOGGLE
+rem Toggle High Quality Flag on or off
+echo %DATE% %TIME% Toggling HQ flag >> "%log_file%"
+if "!HQ_Flag!"=="ON" (
+set "HQ_Flag=OFF"
+) else (
+set "HQ_Flag=ON"
+)
+call :WRITESETTINGS
+Goto CONFIGMENU
+
+:NOALPHAFLAGTOGGLE
+rem Toggle High Quality Flag on or off
+echo %DATE% %TIME% Toggling No Alpha flag >> "%log_file%"
+if "!NoAlpha_Flag!"=="ON" (
+set "NoAlpha_Flag=OFF"
+) else (
+set "NoAlpha_Flag=ON"
+)
+call :WRITESETTINGS
+Goto CONFIGMENU
+
+
+
+
 :LIVERYTEX 
 echo %DATE% %TIME% Prompted user for path to Aircraft TEXTURE folder >> "%log_file%"
 cls
@@ -109,6 +136,8 @@ pause
 rem Write to settings file
 call :WRITESETTINGS
 Goto CONFIGMENU
+
+
 
 :READLAYOUT
 for /f %%a in ('echo prompt $E^| cmd') do set "ESC=%%a"
@@ -198,6 +227,8 @@ echo SimType=%simType%
 echo sdk_root=!sdk_root!
 echo LG_path=!LG_path!
 echo Tex_path=!Tex_path!
+echo HQ_Flag=!HQ_Flag!
+echo NoAlpha_Flag=!NoAlpha_Flag!
 )>userConfig.ini 
 Exit /B
 
@@ -250,6 +281,23 @@ echo %DATE% %TIME% Read settings from settings file: SimType is %SimType% >> "%l
 echo %DATE% %TIME% Read settings from settings file: sdk_root is %sdk_root% >> "%log_file%"
 echo %DATE% %TIME% Read settings from settings file: lg_path is !lg_path! >> "%log_file%"
 echo %DATE% %TIME% Read settings from settings file: tex_path is !tex_path! >> "%log_file%"
+echo %DATE% %TIME% Read settings from settings file: HQ_Flag is !HQ_Flag! >> "%log_file%"
+echo %DATE% %TIME% Read settings from settings file: HQ_Flag is !NoAlpha_Flag! >> "%log_file%"
+if not defined HQ_Flag (
+echo %DATE% %TIME% HQ_Flag is: !HQ_Flag! >> "%log_file%"
+echo %DATE% %TIME% HQ_Flag value was NULL, setting it to ON >> "%log_file%"
+set HQ_Flag=ON
+call :WRITESETTINGS
+echo %DATE% %TIME% Read settings from settings file: HQ_Flag is !HQ_Flag! >> "%log_file%"
+)
+
+if not defined NoAlpha_Flag (
+echo %DATE% %TIME% NoAlpha_Flag is: !NoAlpha_Flag! >> "%log_file%"
+echo %DATE% %TIME% NoAlpha_Flag value was NULL, setting it to OFF >> "%log_file%"
+set NoAlpha_Flag=OFF
+call :WRITESETTINGS
+echo %DATE% %TIME% Read settings from settings file: NoAlpha_Flag is !NoAlpha_Flag! >> "%log_file%"
+)
 
 if exist "!sdk_root!\version.txt" (
 set /p sdkVer=<!sdk_root!\version.txt
@@ -259,6 +307,43 @@ set sdkVer=Unknown
 )
 cls
 )
+
+rem Build the flag strings for the albedo KTX2 files
+
+if %HQ_Flag%==ON (
+	if %NoAlpha_Flag%==ON (
+	rem HQ_Flag is ON + NoAlpha_Flag is ON
+	echo %DATE% %TIME% HQ_Flag is ON + NoAlpha_Flag is ON >> "%log_file%"
+	set "AlbedoFlags=<UserFlags Type="_DEFAULT">QUALITYHIGH</UserFlags><ForceNoAlpha>true</ForceNoAlpha>"
+	echo %DATE% %TIME% AlbedoFlags: !AlbedoFlags! >> "%log_file%"
+	) else (
+	rem HQ_Flag is ON + NoAlpha_Flag is OFF
+	echo %DATE% %TIME% HQ_Flag is ON + NoAlpha_Flag is OFF
+	set "AlbedoFlags=<UserFlags Type="_DEFAULT">QUALITYHIGH</UserFlags><ForceNoAlpha>false</ForceNoAlpha>"
+	echo %DATE% %TIME% AlbedoFlags: !AlbedoFlags! >> "%log_file%"
+	)
+) else (
+	if %NoAlpha_Flag%==ON (
+	rem HQ_Flag is OFF + NoAlpha_Flag is ON
+	echo %DATE% %TIME% HQ_Flag is OFF + NoAlpha_Flag is ON >> "%log_file%"
+	set "AlbedoFlags=<UserFlags Type="_DEFAULT"></UserFlags><ForceNoAlpha>true</ForceNoAlpha>"
+	echo %DATE% %TIME% AlbedoFlags: !AlbedoFlags! >> "%log_file%"
+	) else (
+	rem HQ_Flag is OFF + NoAlpha_Flag is OFF
+	echo %DATE% %TIME% HQ_Flag is OFF + NoAlpha_Flag is OFF >> "%log_file%"
+	set "AlbedoFlags=<UserFlags Type="_DEFAULT"></UserFlags><ForceNoAlpha>false</ForceNoAlpha>"
+	echo %DATE% %TIME% AlbedoFlags: !AlbedoFlags! >> "%log_file%"
+	)
+)
+
+REM set "AlbedoFlags_0=^<UserFlags Type="_DEFAULT"^>"
+REM echo %AlbedoFlags_0%
+REM if %HQ_Flag%==ON (
+REM set "AlbedoFlags_1=!AlbedoFlags_0!HIGHQUALITY"
+REM echo appended
+REM echo !AlbedoFlags_1!
+REM PAUSE
+REM )
 
 SET countWithXML=0
 SET countWithoutXML=0
@@ -493,31 +578,40 @@ rem User input a different value, try again!
 CLS
 goto MENU
 :CONFIGMENU
-ECHO --------------------------------- CONFIGURATION ---------------------------------
 for /f %%a in ('echo prompt $E^| cmd') do set "ESC=%%a"
 echo %DATE% %TIME% Display configuration menu list >> "%log_file%"
 CLS
-ECHO  1: Edit SDK path
-ECHO  %ESC%[0;93m%sdk_root% %ESC%[0m
-ECHO  SDK version detected as: %ESC%[0;93m%sdkVer% %ESC%[0m
+ECHO --------------------------------------------- CONFIGURATION ---------------------------------------------
+ECHO 1: Edit SDK path
+ECHO %ESC%[0;93m%sdk_root% %ESC%[0m
+ECHO SDK version detected as: %ESC%[0;93m%sdkVer% %ESC%[0m
 ECHO.
-ECHO  2: Change MSFS 2024 version
-ECHO  %ESC%[0;93m%simType% %ESC%[0m
+ECHO 2: Change MSFS 2024 version
+ECHO %ESC%[0;93m%simType% %ESC%[0m
 ECHO.
-ECHO  3: Edit MSFSLayoutGenerator path (Optional: updates the layout.json file of an existing livery project)
-ECHO  %ESC%[0;93m%LG_path% %ESC%[0m
+ECHO 3: Edit MSFSLayoutGenerator path (Optional: updates the layout.json file of an existing livery project)
+ECHO %ESC%[0;93m%LG_path% %ESC%[0m
 ECHO.
-ECHO  4: Edit Livery texture path (Optional: output the KTX2 files directly to an existing livery project)
-ECHO  %ESC%[0;93m%Tex_path% %ESC%[0m
+ECHO 4: Edit Livery texture path (Optional: output the KTX2 files directly to an existing livery project)
+ECHO %ESC%[0;93m%Tex_path% %ESC%[0m
+ECHO ----------------------------------------- ALBEDO TEXTURE FLAGS ------------------------------------------
+ECHO 5: QUALITYHIGH - uses higher compression quality, but increases memory usage and KTX2 file size
+ECHO Current state: %ESC%[0;93m%HQ_Flag% %ESC%[0m
 ECHO.
-ECHO  5: Go back to main menu
+ECHO 6: ForceNoAlpha - removes alpha channel from KTX2 file when ON
+ECHO Current state: %ESC%[0;93m%NoAlpha_Flag% %ESC%[0m
+ECHO ---------------------------------------------------------------------------------------------------------
+ECHO.
+ECHO  7: Go back to main menu
 ECHO.
 SET /P S=Choose an option then press ENTER: 
 IF %S%==1 GOTO SDKPATHMENU
 IF %S%==2 GOTO SIMTYPEMENU
 IF %S%==3 GOTO LAYOUTGEN
 IF %S%==4 GOTO LIVERYTEX
-IF %S%==5 GOTO MENU
+IF %S%==5 GOTO HQFLAGTOGGLE
+IF %S%==6 GOTO NOALPHAFLAGTOGGLE
+IF %S%==7 GOTO MENU
 rem User input a different value, try again!
 CLS
 goto CONFIGMENU
@@ -529,14 +623,15 @@ echo %DATE% %TIME% Creating missing XMLs for albedo PNG files >> "%log_file%"
 for %%f in ("%ALBD_dir%\*.png") do (
 if not exist "%%~dpnf.xml" (
 echo %DATE% %TIME% ...Creating XML file for %%~dpnf >> "%log_file%"
-echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>!AlbedoFlags!^</BitmapConfiguration^> > "%%~dpff.xml"
+rem echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
 )
 )
 echo %DATE% %TIME% Creating missing XMLs for albedo TIF files >> "%log_file%"
 for %%f in ("%ALBD_dir%\*.tif") do (
 if not exist "%%~dpnf.xml" (
 echo %DATE% %TIME% ...Creating XML file for %%~dpff >> "%log_file%"
-echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>!AlbedoFlags!^</BitmapConfiguration^> > "%%~dpff.xml"
 )
 )
 echo %DATE% %TIME% Creating missing XMLs for composite PNG files >> "%log_file%"
@@ -588,12 +683,12 @@ echo %DATE% %TIME% User chose option 3 >> "%log_file%"
 echo %DATE% %TIME% Recreating XMLs for albedo PNG files >> "%log_file%"
 for %%f in ("%ALBD_dir%\*.png") do (
 echo %DATE% %TIME% ...Creating XML file for %%~dpff >> "%log_file%"
-echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>!AlbedoFlags!^</BitmapConfiguration^> > "%%~dpff.xml"
 )
 echo %DATE% %TIME% Recreating XMLs for albedo TIF files >> "%log_file%"
 for %%f in ("%ALBD_dir%\*.tif") do (
 echo %DATE% %TIME% ...Creating XML file for %%~dpff >> "%log_file%"
-echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>^<UserFlags Type="_DEFAULT"^>QUALITYHIGH^</UserFlags^>^</BitmapConfiguration^> > "%%~dpff.xml"
+echo ^<BitmapConfiguration^>^<BitmapSlot^>MTL_BITMAP_DECAL0^</BitmapSlot^>!AlbedoFlags!^</BitmapConfiguration^> > "%%~dpff.xml"
 )
 echo %DATE% %TIME% Recreating XMLs for composite PNG files >> "%log_file%"
 for %%f in ("%COMP_dir%\*.png") do (
