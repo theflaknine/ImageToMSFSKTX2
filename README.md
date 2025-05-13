@@ -15,9 +15,9 @@ _For video instructions, check out my [tutorial video](https://youtu.be/rjGJcNRo
    - the path to MSFSLayoutGenerator. This is optional but will allow you to automatically update the layout.json file of your livery after creating the KTX2 files; this functionality also requires you to set the TEXTURES folder as described below. Download MSFSLayoutGenerator [here](https://github.com/HughesMDflyer4/MSFSLayoutGenerator).
    - the path to the TEXTURES folder of your current livery project. This is optional but will allow you to generate the KTX2 files in the correct place, without needing to move or copy them afterwards. Ensure you include the full path to the folder where the texture files should end up.
       - the script contains logic to identify whether your livery project is for a MODULAR or NON-MODULAR MSFS 2024 aircraft, and will locate the layout.json file accordingly.
-   - the QUALITYHIGH flag. IF enabled (ON) this will instruct the MSFS 2024 SDK to use a higher quality compression; the tradeoff here is larger files which use more memory. Default state is ON.
+   - the QUALITYHIGH flag. If enabled (ON) this will instruct the MSFS 2024 SDK to use a higher quality compression; the tradeoff here is larger files which use more memory. Default state is ON. This is currently applicable to ALBEDO and DECAL textures only.
    - the ForceNoAlpha flag. If enabled (ON) this will remove the alpha channel from the resulting KTX2 file. Default state is OFF.
-5. The batch file will also create four folders ALBD, COMP, NORM and DECAL.
+5. The batch file will also create four folders ALBD, COMP, NORM and DECAL. This is currently applicable to ALBEDO and DECAL textures only.
 
 ## Instructions - converting livery artwork to KTX2
 
@@ -59,8 +59,8 @@ For each of your PNG / TIF files, the script:
 ### Decal textures
 *Used to apply details like labels and insignia on top of the base (albedo) texture. Currently, this uses the same flags as Albedo.*
 - BitmapSlot String: MTL_BITMAP_DECAL0
-- UserFlags: QUALITYHIGH
-- ForceNoAlpha: FALSE
+- UserFlags: QUALITYHIGH (starting with v0.14, this flag can be modified in the settings page)
+- ForceNoAlpha: FALSE (starting with v0.14, this flag can be modified in the settings page)
 
 # Donations
 This script is of course free, and there's no expectation for any donations whatsoever. However I have spent countless hours making this script as user-friendly as I can, so it can be shared with the community; so if you do want to offer a "thank you" via a small contribution to my [Buy Me A Coffee page](https://buymeacoffee.com/flaknine) then I'd be incredibly grateful!
