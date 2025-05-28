@@ -16,8 +16,8 @@ _For video instructions, check out my [tutorial video](https://youtu.be/rjGJcNRo
    - the path to the TEXTURES folder of your current livery project. This is optional but will allow you to generate the KTX2 files in the correct place, without needing to move or copy them afterwards. Ensure you include the full path to the folder where the texture files should end up.
       - the script contains logic to identify whether your livery project is for a MODULAR or NON-MODULAR MSFS 2024 aircraft, and will locate the layout.json file accordingly.
    - the QUALITYHIGH flag. If enabled (ON) this will instruct the MSFS 2024 SDK to use a higher quality compression; the tradeoff here is larger files which use more memory. Default state is ON. This is currently applicable to ALBEDO and DECAL textures only.
-   - the ForceNoAlpha flag. If enabled (ON) this will remove the alpha channel from the resulting KTX2 file. Default state is OFF.
-5. The batch file will also create four folders ALBD, COMP, NORM and DECAL. This is currently applicable to ALBEDO and DECAL textures only.
+   - the ForceNoAlpha flag. If enabled (ON) this will remove the alpha channel from the resulting KTX2 file. Default state is OFF. This is currently applicable to ALBEDO and DECAL textures only.
+5. The batch file will also create four folders ALBD, COMP, NORM and DECAL. 
 
 ## Instructions - converting livery artwork to KTX2
 
