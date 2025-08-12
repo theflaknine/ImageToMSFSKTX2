@@ -14,7 +14,7 @@ for /F "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1)
 )
 CLS
 SET "log_file=%~dp0logfile.txt"
-SET "CurrentAppVersion=0.14"
+SET "CurrentAppVersion=0.15"
 SET "AppVersion=%CurrentAppVersion%"
 SET "SimType=UNDEFINED"
 
@@ -868,7 +868,8 @@ echo Press any key to return to the main menu...
 pause >nul
 goto MENU
 )
-
+echo %DATE% %TIME% Delete any temp files left behind if the script didn't end properly last time >> "%log_file%"
+CALL :CLEANUP
 IF !M!==5 (
 	echo %DATE% %TIME% User chose option 5 >> "%log_file%"
 	echo %DATE% %TIME% Check if "%LG_path%\MSFSLayoutGenerator.exe" exists >> "%log_file%"
@@ -915,8 +916,12 @@ mkdir "%~dp0\PackageDefinitions"
 rem Create package definition xml
 echo %DATE% %TIME% Create Package Definition XML png-2-ktx2.xml in PackageDefinitions folder >> "%log_file%"
 echo ^<?xml version="1.0" encoding="utf-8"?^>^<AssetPackage Version="0.1.0"^>^<ItemSettings^>^<ContentType^>AIRCRAFT^</ContentType^>^<Title^>PNG TO KTX2 CONVERTER^</Title^>^<Manufacturer^>FlakNine^</Manufacturer^>^<Creator^>FlakNine^</Creator^>^</ItemSettings^>^<Flags^>^<VisibleInStore^>true^</VisibleInStore^>^<CanBeReferenced^>true^</CanBeReferenced^>^</Flags^>^<AssetGroups^>^<AssetGroup Name="PNG TO KTX2 CONVERTER"^>^<Type^>ModularSimObject^</Type^>^<Flags^>^<FSXCompatibility^>false^</FSXCompatibility^>^</Flags^>^<AssetDir^>PackageSources\SimObjects\Airplanes\png-2-ktx2\^</AssetDir^>^<OutputDir^>SimObjects\Airplanes\png-2-ktx2\^</OutputDir^>^</AssetGroup^>^</AssetGroups^>^</AssetPackage^> > "%~dp0\PackageDefinitions\png-2-ktx2.xml"
+rem Create project xml
 echo %DATE% %TIME% Create project XML png-2-ktx2.xml >> "%log_file%"
 echo ^<?xml version="1.0" encoding="utf-8"?^>^<Project Version="2" Name="PNG TO KTX2 CONVERTER" FolderName="Packages" MetadataFolderName="PackagesMetadata"^>^<OutputDirectory^>.^</OutputDirectory^>^<TemporaryOutputDirectory^>_PackageInt^</TemporaryOutputDirectory^>^<Packages^>^<Package^>PackageDefinitions\png-2-ktx2.xml^</Package^>^</Packages^>^</Project^> > "%~dp0\png-2-ktx2.xml"
+rem Create user XML file
+echo %DATE% %TIME% Create Package Definition XML png-2-ktx2.xml.user >> "%log_file%"
+echo ^<UserSettings^>^<CheckedOutPackages^>^<Package Name="png-2-ktx2"/^>^</CheckedOutPackages^>^<SelectedPackages^>^<Package Name="png-2-ktx2"/^>^</SelectedPackages^>^<Filter/^>^<ShowOnlyEdited^>false^</ShowOnlyEdited^>^</UserSettings^> > "%~dp0\png-2-ktx2.xml.user"
 rem Copy Albedo PNG TIF and XML files
 echo %DATE% %TIME% For each PNG in !ALBD_dir!... >> "%log_file%"
 for %%f in ("%ALBD_dir%\*.png") do (
@@ -1003,23 +1008,38 @@ if %SimType%==STEAM (
 rem Use the -forcesteam parameter (Steam version of sim)
 echo %DATE% %TIME% Command sent: "%sdk_root%\tools\bin\fspackagetool.exe" -nopause -forcesteam -outputtoseparateconsole "%~dp0png-2-ktx2.xml" >> "%log_file%"
 rem pause
-"%sdk_root%\tools\bin\fspackagetool.exe" -nopause -forcesteam -outputtoseparateconsole "%~dp0png-2-ktx2.xml"
+"%sdk_root%\tools\bin\fspackagetool.exe" -nopause -rebuild -forcesteam -outputtoseparateconsole "%~dp0png-2-ktx2.xml"
 ) else ( 
 rem Do not use the -forcesteam parameter (Microsoft version of sim)
 echo %DATE% %TIME% Command sent: "%sdk_root%\tools\bin\fspackagetool.exe" -nopause -outputtoseparateconsole "%~dp0png-2-ktx2.xml" >> "%log_file%"
 rem pause
-"%sdk_root%\tools\bin\fspackagetool.exe" -nopause -outputtoseparateconsole "%~dp0png-2-ktx2.xml"
+"%sdk_root%\tools\bin\fspackagetool.exe" -nopause -rebuild -outputtoseparateconsole "%~dp0png-2-ktx2.xml"
 )
 cls
 echo Step 2 of 3: Generating KTX2 files...
 echo %DATE% %TIME% Step 2 of 3: Generating KTX2 files...  >> "%log_file%"
-:CHECK_PROCESS
-echo %DATE% %TIME% Checking if process name FlightSimulator2024.exe has closed yet... >> "%log_file%"
+:CHECK_PROCESS_STARTED
+	echo %DATE% %TIME% Checking if process name FlightSimulator2024.exe has STARTED yet... >> "%log_file%"
+	tasklist /FI "IMAGENAME eq FlightSimulator2024.exe" 2>NUL | find /I /N "FlightSimulator2024.exe">NUL
+	echo %DATE% %TIME% Process check error code is: %ERRORLEVEL% >> "%log_file%"
+	if "%ERRORLEVEL%"=="0" (
+		echo %DATE% %TIME% FlightSimulator2024.exe is running >> "%log_file%"
+		echo Waiting for Microsoft Flight Simulator 2024 SDK to compile your KTX2 files	
+		) else (
+		echo %DATE% %TIME% FlightSimulator2024.exe has not started yet, keeping checking... >> "%log_file%"
+		timeout /T 1 /NOBREAK >NUL
+		goto CHECK_PROCESS_STARTED
+		)
+:CHECK_PROCESS_ENDED
+echo %DATE% %TIME% (MS Store) Checking if process name FlightSimulator2024.exe has finished yet... >> "%log_file%"
 tasklist /FI "IMAGENAME eq FlightSimulator2024.exe" 2>NUL | find /I /N "FlightSimulator2024.exe">NUL
 if "%ERRORLEVEL%"=="0" (
-    timeout /T 5 /NOBREAK >NUL
-    goto CHECK_PROCESS
-)
+	echo %DATE% %TIME% FlightSimulator2024.exe hasn't finished yet, keep checking... >> "%log_file%"
+    timeout /T 1 /NOBREAK >NUL
+    goto CHECK_PROCESS_ENDED
+	) else (
+	echo %DATE% %TIME% FlightSimulator2024.exe finished >> "%log_file%"
+	)
 cls
 IF !M!==5 (
 echo Step 3 of 3: Completed generation of KTX2 files. 
@@ -1053,7 +1073,9 @@ rmdir /s /q "PackagesMetadata"
 rmdir /s /q "PackageSources"
 rmdir /s /q "Packages"
 echo %DATE% %TIME% Delete project file png-2-ktx2.xml  >> "%log_file%"
-del /q png-2-ktx2.xml 
+del /q png-2-ktx2.xml
+echo %DATE% %TIME% Delete user XML file png-2-ktx2.xml.user  >> "%log_file%"
+del /q png-2-ktx2.xml.user
 IF !M!==5 (
 echo Running MSFSLayoutGenerator.exe on "%layoutPath%"
 echo %DATE% %TIME% Run MSFSLayoutGenerator.exe on "%layoutPath%" >> "%log_file%"
@@ -1068,6 +1090,19 @@ echo Done! This window will close in 20s, or press any key to close it now...
 timeout /t 20 >nul
 echo %DATE% %TIME% End of script >> "%log_file%"
 goto EOF
+:CLEANUP
+rem Delete any leftovers from previous session
+echo %DATE% %TIME% Delete temporary folders if present >> "%log_file%"
+If exist "_PackageInt" (rmdir /s /q "_PackageInt")
+If exist "PackageDefinitions" (rmdir /s /q "PackageDefinitions")
+If exist "PackagesMetadata" (rmdir /s /q "PackagesMetadata")
+If exist "PackageSources" (rmdir /s /q "PackageSources")
+If exist "Packages" (rmdir /s /q "Packages")
+echo %DATE% %TIME% Delete project file png-2-ktx2.xml if present >> "%log_file%"
+If exist "png-2-ktx2.xml" (del /q png-2-ktx2.xml)
+echo %DATE% %TIME% Delete user XML file png-2-ktx2.xml.user if present >> "%log_file%"
+If exist "png-2-ktx2.xml.user" /q png-2-ktx2.xml.user
+Exit /B
 :REFRESH
 CLS
 echo %DATE% %TIME% Refresh menu >> "%log_file%"
