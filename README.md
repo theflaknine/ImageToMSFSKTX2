@@ -62,6 +62,12 @@ For each of your PNG / TIF files, the script:
 - UserFlags: QUALITYHIGH (starting with v0.14, this flag can be modified in the settings page)
 - ForceNoAlpha: FALSE (starting with v0.14, this flag can be modified in the settings page)
 
+## Why do KTX2 files look washed out (lighter than expected) when I open them?
+This is caused by the method used to open the KTX2 file, where sRGB/Linear color space is not interpreted correctly; the issue is not caused by ImageToMSFSKTX2 or the MSFS 2024 SDK. The default settings in the most widely used tool (NVIDIA Texture Tools) result in a washed out appearance when a KTX2 file is opened and/or converted to a PNG for subsequent editing.  Two solutions are:
+1. Use the "Effects" panel in NVIDIA Texture Tools to add the "sRGB to Linear" effect
+2. Use an alternative image editor which support KTX2 files, for example Tacent View. Ensure gamma correction is set to "None".
+Note the ImageToMSFSKTX2 script simply calls the SDK to compile your PNG/TIF files into a KTX2, the actual work is done by the MSFS 2024 SDK.
+
 # Donations
 This script is of course free, and there's no expectation for any donations whatsoever. However I have spent countless hours making this script as user-friendly as I can, so it can be shared with the community; so if you do want to offer a "thank you" via a small contribution to my [Buy Me A Coffee page](https://buymeacoffee.com/flaknine) then I'd be incredibly grateful!
 
