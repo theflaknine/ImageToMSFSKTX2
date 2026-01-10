@@ -67,6 +67,7 @@ This is caused by the method used to open the KTX2 file, where sRGB/Linear color
 1. Use the "Effects" panel in NVIDIA Texture Tools to add the "sRGB to Linear" effect
 2. Use an alternative image editor which support KTX2 files, for example Tacent View. Ensure gamma correction is set to "None".
 Note the ImageToMSFSKTX2 script simply calls the SDK to compile your PNG/TIF files into a KTX2, the actual work is done by the MSFS 2024 SDK.
+<img width="3396" height="2445" alt="Image" src="https://github.com/user-attachments/assets/cf80ba7b-341e-484c-8595-93c2d897ef63" />
 
 # Donations
 This script is of course free, and there's no expectation for any donations whatsoever. However I have spent countless hours making this script as user-friendly as I can, so it can be shared with the community; so if you do want to offer a "thank you" via a small contribution to my [Buy Me A Coffee page](https://buymeacoffee.com/flaknine) then I'd be incredibly grateful!
