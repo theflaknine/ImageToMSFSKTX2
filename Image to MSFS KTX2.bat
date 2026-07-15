@@ -14,7 +14,7 @@ for /F "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1)
 )
 CLS
 SET "log_file=%~dp0logfile.txt"
-SET "CurrentAppVersion=0.15"
+SET "CurrentAppVersion=0.16"
 SET "AppVersion=%CurrentAppVersion%"
 SET "SimType=UNDEFINED"
 
@@ -915,7 +915,7 @@ mkdir "%~dp0\PackageDefinitions"
 )
 rem Create package definition xml
 echo %DATE% %TIME% Create Package Definition XML png-2-ktx2.xml in PackageDefinitions folder >> "%log_file%"
-echo ^<?xml version="1.0" encoding="utf-8"?^>^<AssetPackage Version="0.1.0"^>^<ItemSettings^>^<ContentType^>AIRCRAFT^</ContentType^>^<Title^>PNG TO KTX2 CONVERTER^</Title^>^<Manufacturer^>FlakNine^</Manufacturer^>^<Creator^>FlakNine^</Creator^>^</ItemSettings^>^<Flags^>^<VisibleInStore^>true^</VisibleInStore^>^<CanBeReferenced^>true^</CanBeReferenced^>^</Flags^>^<AssetGroups^>^<AssetGroup Name="PNG TO KTX2 CONVERTER"^>^<Type^>ModularSimObject^</Type^>^<Flags^>^<FSXCompatibility^>false^</FSXCompatibility^>^</Flags^>^<AssetDir^>PackageSources\SimObjects\Airplanes\png-2-ktx2\^</AssetDir^>^<OutputDir^>SimObjects\Airplanes\png-2-ktx2\^</OutputDir^>^</AssetGroup^>^</AssetGroups^>^</AssetPackage^> > "%~dp0\PackageDefinitions\png-2-ktx2.xml"
+echo ^<?xml version="1.0" encoding="utf-8"?^>^<AssetPackage Version="0.1.0"^>^<PackageOrderHint^>CUSTOM_SIMOBJECTS^</PackageOrderHint^>^<ItemSettings^>^<ContentType^>AIRCRAFT^</ContentType^>^<Title^>PNG TO KTX2 CONVERTER^</Title^>^<Manufacturer^>FlakNine^</Manufacturer^>^<Creator^>FlakNine^</Creator^>^</ItemSettings^>^<Flags^>^<VisibleInStore^>true^</VisibleInStore^>^<CanBeReferenced^>true^</CanBeReferenced^>^</Flags^>^<AssetGroups^>^<AssetGroup Name="PNG TO KTX2 CONVERTER"^>^<Type^>ModularSimObject^</Type^>^<Flags^>^<FSXCompatibility^>false^</FSXCompatibility^>^</Flags^>^<AssetDir^>PackageSources\SimObjects\Airplanes\png-2-ktx2\^</AssetDir^>^<OutputDir^>SimObjects\Airplanes\png-2-ktx2\^</OutputDir^>^</AssetGroup^>^</AssetGroups^>^</AssetPackage^> > "%~dp0\PackageDefinitions\png-2-ktx2.xml"
 rem Create project xml
 echo %DATE% %TIME% Create project XML png-2-ktx2.xml >> "%log_file%"
 echo ^<?xml version="1.0" encoding="utf-8"?^>^<Project Version="2" Name="PNG TO KTX2 CONVERTER" FolderName="Packages" MetadataFolderName="PackagesMetadata"^>^<OutputDirectory^>.^</OutputDirectory^>^<TemporaryOutputDirectory^>_PackageInt^</TemporaryOutputDirectory^>^<Packages^>^<Package^>PackageDefinitions\png-2-ktx2.xml^</Package^>^</Packages^>^</Project^> > "%~dp0\png-2-ktx2.xml"
