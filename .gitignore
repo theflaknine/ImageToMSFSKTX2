@@ -1,0 +1,21 @@
+# Image folders created by the script, holding the user's own artwork
+ALBD/
+COMP/
+NORM/
+DECAL/
+
+# Compiled KTX2 output
+OUTPUT/
+
+# Per-user settings (contains local SDK and livery paths) and log
+userConfig.ini
+logfile.txt
+
+# Temporary package scaffolding, normally removed by CLEANUP
+_PackageInt/
+PackageDefinitions/
+PackageSources/
+Packages/
+PackagesMetadata/
+png-2-ktx2.xml
+png-2-ktx2.xml.user
